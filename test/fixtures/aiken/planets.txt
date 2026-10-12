@@ -1,0 +1,12 @@
+Which planet is closest to the Sun?
+A. Venus
+B. Mercury
+C. Earth
+D. Mars
+ANSWER: B
+
+How many moons does Mars have?
+A) None
+B) One
+C) Two
+ANSWER: C
