@@ -1,6 +1,7 @@
 import type { FormatSpec } from '../reader'
 import { aiken } from './aiken'
 import { bbGenerator } from './bb-generator'
+import { flashcards } from './flashcards'
 import { gift } from './gift'
 import { respondus } from './respondus'
 import { text2qti } from './text2qti'
@@ -9,4 +10,4 @@ import { text2qti } from './text2qti'
  * Every Format, in the order that breaks a tie between them: a package
  * before plain text, a specific Format before a general one (ADR-0004).
  */
-export const FORMATS: readonly FormatSpec[] = [bbGenerator, respondus, aiken, text2qti, gift]
+export const FORMATS: readonly FormatSpec[] = [bbGenerator, respondus, aiken, text2qti, gift, flashcards]
