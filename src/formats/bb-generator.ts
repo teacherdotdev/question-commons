@@ -179,7 +179,7 @@ function parseTagged(block: Line[], active: Tag | null): { parsed: Parsed; activ
   const body = ownTag ? block.slice(1) : block
   if (!tag) {
     return {
-      parsed: { error: 'Test Parrot could not tell what kind of question this is. Number it (“1.”), or put its type — MC, MA, TF, ES or BL — on the line above it.' },
+      parsed: { error: 'It is not clear what kind of question this is. Number it (“1.”), or put its type — MC, MA, TF, ES or BL — on the line above it.' },
       active,
     }
   }

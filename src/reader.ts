@@ -1,9 +1,8 @@
 import type { RichText } from './question-bank'
 
 /**
- * The shared vocabulary of every question-file format Test Parrot reads
- * without an AI: what a format's parser hands back, before it becomes a
- * Question Bank Record.
+ * What every Format's reader hands back, before `unify` turns it into
+ * Question Banks. Internal to the package; apps see only the unified form.
  *
  * A parser is a pure function of the file's bytes. The same file always gives
  * the same Questions and the same problems, and nothing is sent anywhere.
@@ -22,6 +21,7 @@ export type FormatId =
   | 'd2l-csv'
   | 'respondus-csv'
   | 'kahoot'
+  | 'blooket'
   | 'spreadsheet'
   | 'flashcards'
 
@@ -29,9 +29,8 @@ export type FormatId =
 export type Blocks = RichText
 
 /**
- * One question as its source format meant it. It may be a kind Test Parrot
- * has no Question Type for, such as Multiple Answer; `record.ts` decides once,
- * for every format, what each kind becomes and what the teacher is told.
+ * One question as its Format meant it, before `unify` gives it its Question
+ * Type and Provenance.
  */
 export type ReaderQuestion = {
   /** 1-based line (or row) the question starts on, when the format has lines. */

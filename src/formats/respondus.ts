@@ -15,7 +15,7 @@ import { BLANK_MARK, type Blocks, type ReaderChoice, type ReaderQuestion, type F
  * or `MR` multiple answer, `ORD` ordering, `FMB` fill in multiple blanks),
  * `Title:` its title, and `Points:` its points and every later question's,
  * kept as Points when a whole number. `~ ` and `@ ` lines are feedback.
- * Test Parrot keeps neither titles nor feedback.
+ * Titles and feedback are not read.
  *
  * Where Respondus would quietly mark answer A correct because nothing else
  * is, this leaves the question out and says so: a guessed answer key is
@@ -205,7 +205,7 @@ function build(draft: Draft, key: Map<string, string[]>, content: (text: string)
   const sourceType = draft.sourceType ?? 'MC'
   const base = { line, sourceType, stem, ...(draft.points !== undefined ? { points: draft.points } : {}) }
   if (!kind) {
-    return { code: 'unsupported-type', error: `Test Parrot cannot read Respondus questions of type “${draft.sourceType}”, so it was left out.` }
+    return { code: 'unsupported-type', error: `Respondus questions of type “${draft.sourceType}” can’t be read, so it was left out.` }
   }
 
   switch (kind) {

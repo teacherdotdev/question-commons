@@ -21,7 +21,7 @@ import type { Blocks, ReaderChoice, ReaderQuestion, FormatInput, FormatSpec, Imp
  *
  * Bold, italics, code, links and `$…$` math in the Markdown are kept.
  * text2qti can run a ```` ```{.python .run} ```` block to write questions;
- * Test Parrot never runs one, and says it left it out.
+ * Code is never run, so such a block is left out and reported.
  */
 
 const QUESTION = /^(\d+)\.[ \t]+(.*)$/
@@ -165,7 +165,7 @@ export function parseText2qti(text: string): ParseResult {
         ? {
             severity: 'error',
             code: 'code-block-not-run',
-            message: `Line ${line.line}: this code block writes questions when text2qti runs it. Test Parrot never runs code, so any questions it would write were left out.`,
+            message: `Line ${line.line}: this code block writes questions when text2qti runs it. Code is never run, so any questions it would write were left out.`,
             line: line.line,
             excerpt: excerpt(text),
           }

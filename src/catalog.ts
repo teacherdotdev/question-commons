@@ -1,7 +1,7 @@
 import type { FormatId } from './reader'
 
 /**
- * What a teacher is told about the question formats Test Parrot reads, kept
+ * What a teacher is told about the Formats this package reads, kept
  * apart from the parsers so a drop zone can name them without loading them.
  */
 
@@ -19,6 +19,7 @@ export const FORMAT_LABELS: Record<FormatId, string> = {
   'd2l-csv': 'Brightspace (D2L) question CSV',
   'respondus-csv': 'Respondus CSV',
   kahoot: 'Kahoot spreadsheet',
+  blooket: 'Blooket spreadsheet',
   spreadsheet: 'Spreadsheet (CSV or Excel)',
   flashcards: 'Flashcards (Quizlet or Anki)',
 }
@@ -34,6 +35,7 @@ export const SUPPORTED_SOURCES: readonly string[] = [
   'Respondus',
   'text2qti',
   'Kahoot',
+  'Blooket',
   'Quizlet and Anki',
   'CSV and Excel spreadsheets',
 ]

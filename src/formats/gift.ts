@@ -152,7 +152,7 @@ function parseQuestion(source: string, line: number, onMissing: (source: string)
 
   const answers = answersOf(body)
   if (!answers.length) {
-    return { error: `Test Parrot could not read its answers, “${excerpt(release(body), 30)}”. Start each with = (right) or ~ (wrong).` }
+    return { error: `its answers could not be read, “${excerpt(release(body), 30)}”. Start each with = (right) or ~ (wrong).` }
   }
   if (answers.some((answer) => answer.match !== null)) {
     const pairs = answers.map((answer) => ({
