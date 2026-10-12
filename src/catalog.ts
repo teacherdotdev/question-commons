@@ -20,6 +20,7 @@ export const FORMAT_LABELS: Record<FormatId, string> = {
   'respondus-csv': 'Respondus CSV',
   kahoot: 'Kahoot spreadsheet',
   blooket: 'Blooket spreadsheet',
+  'class-gauntlet': 'Class Gauntlet spreadsheet',
   spreadsheet: 'Spreadsheet (CSV or Excel)',
   flashcards: 'Flashcards (Quizlet or Anki)',
 }
@@ -36,6 +37,7 @@ export const SUPPORTED_SOURCES: readonly string[] = [
   'text2qti',
   'Kahoot',
   'Blooket',
+  'Class Gauntlet',
   'Quizlet and Anki',
   'CSV and Excel spreadsheets',
 ]

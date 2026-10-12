@@ -22,6 +22,7 @@ export type FormatId =
   | 'respondus-csv'
   | 'kahoot'
   | 'blooket'
+  | 'class-gauntlet'
   | 'spreadsheet'
   | 'flashcards'
 
@@ -115,6 +116,9 @@ export type ReaderImage = { bytes: Uint8Array; mimeType: string }
 
 export type ParseResult = {
   questions: ReaderQuestion[]
+  /** A file holding several Question Banks gives each its questions here,
+   *  in place of `questions`. */
+  banks?: { name: string; extras?: Record<string, string>; questions: ReaderQuestion[] }[]
   issues: ImportIssue[]
   /** How many questions the file held, including those left out. */
   found: number

@@ -34,6 +34,7 @@ export type SpreadsheetHeader = {
   correct: number
   topics: number[]
   points: number
+  explanation: number
   options: Option[]
   /** Whether the options are the wrong answers, the right one given apart. */
   distractors: boolean
@@ -52,6 +53,7 @@ const TYPE = /^(type|question type|qtype|item type|format)$/
 const CORRECT = /^(correct|correct answers?|correct options?|correct choices?|correct letter|answers?|answer key|key|right answer|solution)$/
 const TOPICS = /^(topics?|category|categories|tags?|subject|unit|chapter)$/
 const POINTS = /^(points?|pts|point value|marks?)$/
+const EXPLANATION = /^(explanation|explanations|feedback|general feedback|why|reason|rationale)$/
 const OPTION = /^(?:(option|choice|answer|alternative|response)s? ?([a-j]|10|[1-9])|(incorrect answer|wrong answer|distractor|incorrect) ?([a-j]|10|[1-9])?|([a-j]))$/
 
 /** The header row among the first rows: a question column, and options or
@@ -87,6 +89,7 @@ export function spreadsheetHeader(rows: SheetRow[]): SpreadsheetHeader | null {
       correct,
       topics: labels.flatMap((text, column) => (TOPICS.test(text) ? [column] : [])),
       points: labels.findIndex((text) => POINTS.test(text)),
+      explanation: labels.findIndex((text) => EXPLANATION.test(text)),
       options: kept,
       distractors: distractors && kept.length > 0,
     }
@@ -142,12 +145,14 @@ function parseRow(row: SheetRow, header: SpreadsheetHeader): ReaderQuestion | st
   if (kind === 'unsupported') return `“${excerpt(typeText, 30)}” questions can’t be read from a spreadsheet, so it was left out.`
   const topics = header.topics.flatMap((column) => field(column).split(/[,;]/)).map((topic) => topic.trim()).filter(Boolean)
   const points = pointsIn(field(header.points))
+  const explanation = field(header.explanation).trim()
   const base = {
     line: row.line,
     ...(typeText ? { sourceType: typeText } : {}),
     ...(topics.length ? { topics } : {}),
     ...(points !== undefined ? { points } : {}),
     stem: richBlocks(field(header.question).trim()),
+    ...(explanation ? { explanation: richBlocks(explanation) } : {}),
   }
   const answer = field(header.correct).trim()
   const options = header.options

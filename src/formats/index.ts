@@ -4,6 +4,7 @@ import { bbGenerator } from './bb-generator'
 import { bbPackage } from './bb-package'
 import { bbTsv } from './bb-tsv'
 import { blooket } from './blooket'
+import { classGauntlet } from './class-gauntlet'
 import { d2lCsv } from './d2l-csv'
 import { flashcards } from './flashcards'
 import { gift } from './gift'
@@ -27,6 +28,7 @@ export const FORMATS: readonly FormatSpec[] = [
   d2lCsv,
   respondusCsv,
   blooket,
+  classGauntlet,
   kahoot,
   bbGenerator,
   respondus,

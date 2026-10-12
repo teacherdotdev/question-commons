@@ -64,36 +64,43 @@ function picturesShown(banks: QuestionBank[], images: ParseResult['images']): Re
 
 export function unify(result: ParseResult, context: UnifyContext): Unified {
   const issues = result.issues.map(leftOut).filter((issue) => issue !== null)
-  const questions: Question[] = []
-  result.questions.forEach((question, index) => {
-    const number = question.number ?? index + 1
-    const unified = unifyQuestion(question, number)
-    if ('question' in unified) questions.push(unified.question)
-    else {
-      const place = question.line ? `Question ${number} (line ${question.line})` : `Question ${number}`
-      issues.push({
-        code: unified.code,
-        message: `${place}: ${unified.message}`,
-        ...(question.line ? { line: question.line } : {}),
-        excerpt: excerpt(blocksText(question.stem)),
-      })
+  const groups = result.banks ?? [{ name: result.name?.trim() || bankNameFromFile(context.fileName), questions: result.questions }]
+  let index = 0
+  const banks = groups.map((group): QuestionBank => {
+    const questions: Question[] = []
+    for (const question of group.questions) {
+      const number = question.number ?? index + 1
+      index += 1
+      const unified = unifyQuestion(question, number)
+      if ('question' in unified) questions.push(unified.question)
+      else {
+        const place = question.line ? `Question ${number} (line ${question.line})` : `Question ${number}`
+        issues.push({
+          code: unified.code,
+          message: `${place}: ${unified.message}`,
+          ...(question.line ? { line: question.line } : {}),
+          excerpt: excerpt(blocksText(question.stem)),
+        })
+      }
+    }
+    const extras = Object.fromEntries(Object.entries(group.extras ?? {}).filter(([, value]) => value.trim()))
+    return {
+      format: QUESTION_BANK_FORMAT,
+      version: QUESTION_BANK_VERSION,
+      name: group.name,
+      ...(!result.banks && result.description?.trim() ? { description: result.description.trim() } : {}),
+      ...(Object.keys(extras).length ? { extras } : {}),
+      provenance: {
+        format: context.format,
+        formatLabel: FORMAT_LABELS[context.format],
+        fileName: context.fileName,
+        readAt: context.readAt,
+        reader: { ...READER },
+      },
+      questions,
     }
   })
-  const bank: QuestionBank = {
-    format: QUESTION_BANK_FORMAT,
-    version: QUESTION_BANK_VERSION,
-    name: result.name?.trim() || bankNameFromFile(context.fileName),
-    ...(result.description?.trim() ? { description: result.description.trim() } : {}),
-    provenance: {
-      format: context.format,
-      formatLabel: FORMAT_LABELS[context.format],
-      fileName: context.fileName,
-      readAt: context.readAt,
-      reader: { ...READER },
-    },
-    questions,
-  }
-  return { banks: [bank], issues, pictures: picturesShown([bank], result.images) }
+  return { banks, issues, pictures: picturesShown(banks, result.images) }
 }
 
 type UnifiedQuestion = { question: Question } | { code: string; message: string }
