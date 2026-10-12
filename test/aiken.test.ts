@@ -30,4 +30,27 @@ describe('Aiken', () => {
       { line: 8, number: 2 },
     ])
   })
+
+  test('leaves out a question it cannot read, and does not report one it read exactly despite loose writing', async () => {
+    const reading = await readQuestionFile({ name: 'lenient.txt', bytes: fixture('aiken/lenient.txt') }, { readAt })
+
+    expect(reading.format).toBe('aiken')
+    const questions = reading.banks[0]!.questions
+    expect(questions.map((question) => plainText(question.stem))).toEqual(['Which planet is known as\nthe red planet?', 'What is 2 + 2?'])
+    expect(questions.map((question) => question.provenance.number)).toEqual([1, 2])
+    expect(reading.issues).toEqual([
+      {
+        code: 'unreadable-question',
+        message: 'Question 3 (line 12): it has no ANSWER line. Put “ANSWER: ” and the correct letter on the line after its answers.',
+        line: 12,
+        excerpt: 'Which gas do plants absorb? A. Oxygen B. Carbon dioxide',
+      },
+      {
+        code: 'unreadable-question',
+        message: 'Question 4 (line 16): its ANSWER is E, but it has no answer E.',
+        line: 16,
+        excerpt: 'What is the largest ocean? A. Atlantic B. Pacific ANSWER: E',
+      },
+    ])
+  })
 })

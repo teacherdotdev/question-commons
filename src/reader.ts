@@ -50,6 +50,8 @@ export type ReaderQuestion = {
    *  set's. */
   points?: number
   stem: Blocks
+  /** What the file says about the question as a whole, such as general feedback. */
+  explanation?: Blocks
 } & (
   | { kind: 'multiple-choice'; choices: ReaderChoice[] }
   /** Several choices may be correct: a student picks all that apply. */

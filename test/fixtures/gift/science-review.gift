@@ -1,0 +1,40 @@
+// A hand-written GIFT file covering every question type the format carries.
+$CATEGORY: science/review
+
+// true/false, with general feedback
+::TF1:: Water boils at 100 °C at sea level. {TRUE ####At sea level, yes.}
+
+// multiple choice
+::MC1:: Which gas do plants take in? { =carbon dioxide ~oxygen ~nitrogen }
+
+// a missing word, with several accepted answers
+::FB1:: A spider has {=eight =8} legs.
+
+// short answer: accepted answers and no wrong ones, after the text
+::SA1:: Which planet is called the red planet? { =Mars =the red planet }
+
+// matching
+::MA1:: Match each animal with its food. { =cat -> fish =cow -> grass =bird -> seeds }
+
+// numeric with a tolerance, and a range
+::NU1:: How many days are in a leap year? {#366:0}
+
+::NU2:: Name a number from 1 to 5. {#1..5}
+
+// essay
+::ES1:: Explain how a rainbow forms. {}
+
+// multiple answer: weights with no single right answer
+::MU1:: Which of these are mammals? { ~%50%whale ~%50%bat ~%-100%shark }
+
+// escapes
+::ES2:: Which answer equals 5? { ~\= 2 + 2 =\= 2 + 3 ~\= 2 + 4 }
+
+// a picture GIFT cannot carry
+::PI1:: [html]<p>What is shown?</p><img src="cell.png" alt="a cell"> { =a plant cell ~an animal cell }
+
+// a description, text between questions
+::Intro:: The next question is about space.
+
+$CATEGORY: space
+::SP1:: The Moon orbits the Earth. {T}
