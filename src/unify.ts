@@ -101,8 +101,27 @@ function placeBlanks(blocks: RichText, asBlank: boolean): RichText {
   return blocks.flatMap(walk)
 }
 
+const UNDERSCORES = /_{3,}/g
+
+/** Where a file marks no blank, the teacher's own runs of underscores are
+ *  the places, when there is exactly one run per blank. */
+function markUnderscores(blocks: RichText, blanks: number): RichText {
+  if (JSON.stringify(blocks).includes(BLANK_MARK)) return blocks
+  const runs = blocksText(blocks).match(UNDERSCORES)?.length ?? 0
+  if (runs !== blanks) return blocks
+  const walk = (node: RichTextNode): RichTextNode =>
+    node.type === 'text' && node.text
+      ? { ...node, text: node.text.replace(UNDERSCORES, BLANK_MARK) }
+      : node.content
+        ? { ...node, content: node.content.map(walk) }
+        : node
+  return blocks.map(walk)
+}
+
 function unifyQuestion(question: ReaderQuestion, number: number): Unified {
   const fillIn = question.kind === 'fill-in-blank' || question.kind === 'fill-in-blanks'
+  if (question.kind === 'fill-in-blank') question = { ...question, stem: markUnderscores(question.stem, 1) }
+  else if (question.kind === 'fill-in-blanks') question = { ...question, stem: markUnderscores(question.stem, question.blanks.length) }
   if (question.kind !== 'matching' && isBlank(question.stem)) {
     return leaveOut('empty-stem', 'it has no question text, so it was left out.')
   }
