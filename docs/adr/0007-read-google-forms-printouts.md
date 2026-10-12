@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # Read Google Forms printouts, which carry no answer key
@@ -8,7 +8,7 @@ Teachers keep Google Forms as PDFs printed from the form editor (More → Print 
 
 A printout never says which answer is right: the editor prints the form as a respondent sees it, with no answer key and no points. Under ADR-0003 a question whose right answer the file doesn't give is left out, so a printout's multiple choice, checkbox and dropdown questions are left out with an Import Issue saying so, and its short answer and paragraph questions come in as Short Answer. Linear scales, grids, dates and times are not Question Types and are left out too.
 
-Proposed rather than accepted: whether a choice question with no known answer should come in anyway, for an app to ask the teacher which answer is right, is a change to ADR-0003 and the Question Bank spec that is the teacher.dev team's to make.
+Still open: whether a choice question with no known answer should come in anyway, for an app to ask the teacher which answer is right. That would change ADR-0003 and the Question Bank spec.
 
 ## Consequences
 
