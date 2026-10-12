@@ -54,6 +54,9 @@ export type RichTextNode = {
 
 export type RichText = RichTextNode[]
 
+/** A picture exactly as the file carried it (ADR-0001): its bytes and type. */
+export type Picture = { bytes: Uint8Array; mimeType: string }
+
 /** Text values kept under the names the file gave them (ADR-0005). */
 export type Extras = Record<string, string>
 

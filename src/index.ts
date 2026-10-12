@@ -1,6 +1,6 @@
 import { FORMAT_LABELS } from './catalog'
 import { FORMATS } from './formats'
-import type { QuestionBank } from './question-bank'
+import type { Picture, QuestionBank } from './question-bank'
 import type { FormatId, FormatInput, FormatSpec, ZipFiles } from './reader'
 import { decodeText } from './text'
 import { unify, type ImportIssue } from './unify'
@@ -24,6 +24,9 @@ export type FormatCandidate = { format: FormatId; label: string; score: number }
 export type Reading = {
   banks: QuestionBank[]
   issues: ImportIssue[]
+  /** The pictures its questions show, as the file carried them, by the key
+   *  a `block-image` names in their rich text. */
+  pictures: Record<string, Picture>
   /** The Format the file was read as. */
   format: FormatId
   /** Every Format the file could be, best first, for reading it as another. */
@@ -62,16 +65,16 @@ async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput> {
 
 const MIN_CONFIDENCE = 0.5
 
-type Trial = { format: FormatSpec; banks: QuestionBank[]; issues: ImportIssue[]; confidence: number }
+type Trial = { format: FormatSpec; banks: QuestionBank[]; issues: ImportIssue[]; pictures: Record<string, Picture>; confidence: number }
 
 async function tryFormat(format: FormatSpec, input: FormatInput, score: number, readAt: string): Promise<Trial | null> {
   try {
     const result = await format.parse(input)
-    const { banks, issues } = unify(result, { format: format.id, fileName: input.name, readAt })
+    const { banks, issues, pictures } = unify(result, { format: format.id, fileName: input.name, readAt })
     const imported = banks.reduce((sum, bank) => sum + bank.questions.length, 0)
     const found = Math.max(result.found, imported)
     const share = found ? imported / found : 0
-    return { format, banks, issues, confidence: imported ? 0.5 * score + 0.5 * share : 0 }
+    return { format, banks, issues, pictures, confidence: imported ? 0.5 * score + 0.5 * share : 0 }
   } catch {
     return null
   }
@@ -136,6 +139,7 @@ export async function readQuestionFile(
   return {
     banks: best.banks,
     issues: best.issues,
+    pictures: best.pictures,
     format: best.format.id,
     candidates: candidates.length ? candidates : [{ format: best.format.id, label: FORMAT_LABELS[best.format.id], score: best.confidence }],
   }

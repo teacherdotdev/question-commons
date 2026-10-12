@@ -3,6 +3,7 @@ import {
   QUESTION_BANK_FORMAT,
   QUESTION_BANK_VERSION,
   READER,
+  type Picture,
   type Question,
   type QuestionBank,
   type RichText,
@@ -47,7 +48,21 @@ const leftOut = (issue: ReaderIssue): ImportIssue | null =>
     : null
 
 /** One Format's reading of a file, as Question Banks and what was left out. */
-export function unify(result: ParseResult, context: UnifyContext): { banks: QuestionBank[]; issues: ImportIssue[] } {
+export type Unified = { banks: QuestionBank[]; issues: ImportIssue[]; pictures: Record<string, Picture> }
+
+/** The pictures the kept questions show, by the key their rich text names. */
+function picturesShown(banks: QuestionBank[], images: ParseResult['images']): Record<string, Picture> {
+  const pictures: Record<string, Picture> = {}
+  if (!images?.size) return pictures
+  for (const match of JSON.stringify(banks).matchAll(/"asset":"((?:[^"\\]|\\.)*)"/g)) {
+    const key = JSON.parse(`"${match[1]}"`) as string
+    const image = images.get(key)
+    if (image) pictures[key] = { bytes: image.bytes, mimeType: image.mimeType }
+  }
+  return pictures
+}
+
+export function unify(result: ParseResult, context: UnifyContext): Unified {
   const issues = result.issues.map(leftOut).filter((issue) => issue !== null)
   const questions: Question[] = []
   result.questions.forEach((question, index) => {
@@ -78,12 +93,12 @@ export function unify(result: ParseResult, context: UnifyContext): { banks: Ques
     },
     questions,
   }
-  return { banks: [bank], issues }
+  return { banks: [bank], issues, pictures: picturesShown([bank], result.images) }
 }
 
-type Unified = { question: Question } | { code: string; message: string }
+type UnifiedQuestion = { question: Question } | { code: string; message: string }
 
-const leaveOut = (code: string, message: string): Unified => ({ code, message })
+const leaveOut = (code: string, message: string): UnifiedQuestion => ({ code, message })
 
 /** A blank's place in the stem: a `blank` node in a Fill in the Blank
  *  question, and the line a student sees anywhere else. */
@@ -118,7 +133,7 @@ function markUnderscores(blocks: RichText, blanks: number): RichText {
   return blocks.map(walk)
 }
 
-function unifyQuestion(question: ReaderQuestion, number: number): Unified {
+function unifyQuestion(question: ReaderQuestion, number: number): UnifiedQuestion {
   const fillIn = question.kind === 'fill-in-blank' || question.kind === 'fill-in-blanks'
   if (question.kind === 'fill-in-blank') question = { ...question, stem: markUnderscores(question.stem, 1) }
   else if (question.kind === 'fill-in-blanks') question = { ...question, stem: markUnderscores(question.stem, question.blanks.length) }
