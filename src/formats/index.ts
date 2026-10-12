@@ -1,40 +1,25 @@
+import { FORMATS } from '../catalog'
 import type { FormatSpec } from '../reader'
 import { aiken } from './aiken'
 import { bbGenerator } from './bb-generator'
-import { bbPackage } from './bb-package'
+import { bbPackage, bbXml } from './bb-package'
 import { bbTsv } from './bb-tsv'
 import { blooket } from './blooket'
 import { classGauntlet } from './class-gauntlet'
 import { d2lCsv } from './d2l-csv'
-import { flashcards } from './flashcards'
+import { anki, quizlet } from './flashcards'
 import { gift } from './gift'
 import { kahoot } from './kahoot'
 import { moodleXml } from './moodle-xml'
-import { qti } from './qti'
+import { qtiPackage, qtiXml } from './qti'
 import { respondus } from './respondus'
 import { respondusCsv } from './respondus-csv'
-import { spreadsheet } from './spreadsheet'
 import { text2qti } from './text2qti'
 
-/**
- * Every Format, in the order that breaks a tie between them: a package
- * before plain text, a specific Format before a general one (ADR-0004).
- */
-export const FORMATS: readonly FormatSpec[] = [
-  bbPackage,
-  qti,
-  moodleXml,
-  bbTsv,
-  d2lCsv,
-  respondusCsv,
-  blooket,
-  classGauntlet,
-  kahoot,
-  bbGenerator,
-  respondus,
-  aiken,
-  text2qti,
-  gift,
-  spreadsheet,
-  flashcards,
+const readers = [
+  aiken, anki, bbGenerator, bbPackage, bbTsv, bbXml, blooket, classGauntlet, d2lCsv, gift, kahoot, moodleXml,
+  qtiPackage, qtiXml, quizlet, respondus, respondusCsv, text2qti,
 ]
+
+/** Every Format's reader, in the catalogue's order, which breaks a tie between them (ADR-0004). */
+export const READERS: readonly FormatSpec[] = FORMATS.map(({ id }) => readers.find((reader) => reader.id === id)!)

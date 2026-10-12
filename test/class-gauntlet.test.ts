@@ -58,16 +58,24 @@ describe('Class Gauntlet spreadsheet', () => {
   })
 })
 
-describe('A spreadsheet’s explanation column', () => {
-  test('is each question’s explanation, as in Class Gauntlet’s template', async () => {
-    const reading = await read('template.csv', [
+describe('Class Gauntlet’s template', () => {
+  test('with no set title is one bank, named after the file, each explanation kept', async () => {
+    const reading = await read('Times tables.csv', [
       'question,A,B,C,D,answer,explanation',
       'What is 7 × 8?,54,56,64,,B,Seven eights are fifty-six.',
       'A synonym for “happy” is…,joyful,angry,tired,,A,',
     ].join('\n'))
-    expect(reading.format).toBe('spreadsheet')
+    expect(reading.format).toBe('class-gauntlet')
+    expect(reading.banks.map((bank) => [bank.name, bank.extras])).toEqual([['Times tables', undefined]])
     const [product, synonym] = reading.banks[0]!.questions
+    expect(choices(product)).toEqual([['54', false], ['56', true], ['64', false]])
     expect(plainText(product!.explanation!)).toBe('Seven eights are fifty-six.')
     expect(synonym!.explanation).toBeUndefined()
+  })
+
+  test('pasted from a spreadsheet as tab-separated cells, the answer written out as its text', async () => {
+    const reading = await read('Pasted questions.txt', 'Question\tA\tB\tC\tAnswer\nCapital of France?\tParis\tRome\tOslo\tparis\n')
+    expect(reading.format).toBe('class-gauntlet')
+    expect(choices(reading.banks[0]!.questions[0])).toEqual([['Paris', true], ['Rome', false], ['Oslo', false]])
   })
 })

@@ -309,6 +309,15 @@ async function detect(input: FormatInput): Promise<number> {
 
 export const bbPackage: FormatSpec = {
   id: 'bb-package',
+  shape: 'package',
+  detect,
+  parse: parseBbPackage,
+}
+
+/** One pool or test file from inside an export, such as `res00001.dat`. */
+export const bbXml: FormatSpec = {
+  id: 'bb-xml',
+  shape: 'xml',
   detect,
   parse: parseBbPackage,
 }

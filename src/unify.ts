@@ -1,4 +1,4 @@
-import { FORMAT_LABELS } from './catalog'
+import { formatInfo } from './catalog'
 import {
   QUESTION_BANK_FORMAT,
   QUESTION_BANK_VERSION,
@@ -92,7 +92,7 @@ export function unify(result: ParseResult, context: UnifyContext): Unified {
       ...(Object.keys(extras).length ? { extras } : {}),
       provenance: {
         format: context.format,
-        formatLabel: FORMAT_LABELS[context.format],
+        formatLabel: formatInfo(context.format).label,
         fileName: context.fileName,
         readAt: context.readAt,
         reader: { ...READER },

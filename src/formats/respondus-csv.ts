@@ -132,6 +132,7 @@ async function detect(input: FormatInput): Promise<number> {
 
 export const respondusCsv: FormatSpec = {
   id: 'respondus-csv',
+  shape: 'table',
   detect,
   parse: async (input) => parseRespondusRows((await readSheet(input))?.rows ?? []),
 }

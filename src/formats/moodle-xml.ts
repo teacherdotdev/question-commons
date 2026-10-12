@@ -443,6 +443,7 @@ function detect(input: FormatInput): number {
 
 export const moodleXml: FormatSpec = {
   id: 'moodle-xml',
+  shape: 'xml',
   detect,
   parse: (input) => parseMoodleXml(input.text()),
 }

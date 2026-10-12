@@ -130,6 +130,7 @@ function detect(input: FormatInput): number {
 
 export const aiken: FormatSpec = {
   id: 'aiken',
+  shape: 'text',
   detect,
   parse: (input) => parseAiken(input.text()),
 }

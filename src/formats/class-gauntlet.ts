@@ -1,16 +1,22 @@
 import { plainBlocks } from '../rich-text'
 import { excerpt } from '../text'
+import { bankNameFromFile } from '../unify'
 import type { FormatInput, FormatSpec, ImportIssue, ParseResult, ReaderQuestion } from '../reader'
 import { isBlankRow, readSheet, type SheetRow } from './sheet'
 
 /**
- * Class Gauntlet's question sets, as it exports them or as the open-source
- * project it grew from wrote them. Every row carries its set's title, subject
- * and grade, so a file holds several sets; each becomes a Question Bank with
- * its subject and grade as Extras (ADR-0005).
+ * Class Gauntlet's question sets, as it exports them, as its template lays
+ * them out, or as the open-source project it grew from wrote them.
  *
- * Its own export: `set title, subject, grade, question, A, B, C, D, answer,
- * explanation`, the answer a letter. The original project's: `set title,
+ * Its template: `question, A, B, C, D, answer, explanation`, D and the
+ * explanation optional, the answer a letter or the right choice's own text.
+ * Teachers paste it from a spreadsheet as tab-separated cells, too. Its
+ * export adds `set title, subject, grade` to every row, so a file holds
+ * several sets; each becomes a Question Bank with its subject and grade as
+ * Extras (ADR-0005). Without a set title, the file is one bank named after
+ * it.
+ *
+ * The original project's: `set title, The original project's: `set title,
  * subject, grade, question, choices, correct, explanation`, the choices a
  * JSON list and the right one counted from zero. Every question is Multiple
  * Choice with two to four choices.
@@ -52,7 +58,7 @@ export function gauntletHeader(rows: SheetRow[]): Header | null {
     }
     const lettered = header.letters[0]! >= 0 && header.letters[1]! >= 0 && header.answer >= 0
     const listed = header.choices >= 0 && header.correct >= 0
-    if (header.title >= 0 && header.question >= 0 && (lettered || listed)) return header
+    if (header.question >= 0 && (lettered || (listed && header.title >= 0))) return header
   }
   return null
 }
@@ -75,7 +81,9 @@ function parseRow(row: SheetRow, header: Header): { question: ReaderQuestion } |
     choices = header.letters.map(cell)
     while (choices.length > 2 && choices.at(-1) === '') choices.pop()
     const key = cell(header.answer)
-    correct = /^[a-d]$/i.test(key) ? key.toUpperCase().charCodeAt(0) - 65 : -1
+    correct = /^[a-d]$/i.test(key)
+      ? key.toUpperCase().charCodeAt(0) - 65
+      : choices.findIndex((choice) => choice !== '' && choice.toLowerCase() === key.toLowerCase())
     if (correct < 0 || correct >= choices.length || !choices[correct]) {
       return { error: `its answer “${excerpt(key, 10)}” is not one of its choices. Use a letter like B.` }
     }
@@ -93,7 +101,7 @@ function parseRow(row: SheetRow, header: Header): { question: ReaderQuestion } |
   }
 }
 
-export function parseGauntletRows(rows: SheetRow[], fallbackTitle: string): ParseResult {
+export function parseGauntletRows(rows: SheetRow[], fileName: string): ParseResult {
   const header = gauntletHeader(rows)
   if (!header) return { questions: [], issues: [], found: 0 }
   const banks = new Map<string, { name: string; extras: Record<string, string>; questions: ReaderQuestion[] }>()
@@ -115,12 +123,15 @@ export function parseGauntletRows(rows: SheetRow[], fallbackTitle: string): Pars
       })
       continue
     }
-    const name = cell(header.title) || fallbackTitle
+    const name = cell(header.title) || bankNameFromFile(fileName)
     const bank = banks.get(name) ?? { name, extras: { subject: cell(header.subject), grade: cell(header.grade) }, questions: [] }
     bank.questions.push({ ...parsed.question, number: found })
     banks.set(name, bank)
   }
-  return { questions: [...banks.values()].flatMap((bank) => bank.questions), banks: [...banks.values()], issues, found }
+  const questions = [...banks.values()].flatMap((bank) => bank.questions)
+  // Its template names no set: one bank, named after the file.
+  if (header.title < 0) return { questions, issues, found }
+  return { questions, banks: [...banks.values()], issues, found }
 }
 
 async function detect(input: FormatInput): Promise<number> {
@@ -130,6 +141,7 @@ async function detect(input: FormatInput): Promise<number> {
 
 export const classGauntlet: FormatSpec = {
   id: 'class-gauntlet',
+  shape: 'table',
   detect,
-  parse: async (input) => parseGauntletRows((await readSheet(input))?.rows ?? [], 'Imported questions'),
+  parse: async (input) => parseGauntletRows((await readSheet(input))?.rows ?? [], input.name),
 }

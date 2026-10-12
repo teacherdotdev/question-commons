@@ -35,7 +35,9 @@ describe('the Question Bank schema', () => {
   })
 
   test.each(sampleFiles())('every Question Bank read from %s follows it', async (path) => {
-    const reading = await readQuestionFile({ name: path.split('/').pop()!, bytes: fixture(path) }, { readAt })
+    // Quizlet is read only when asked for (ADR-0006).
+    const format = path.includes('quizlet') ? 'quizlet' : undefined
+    const reading = await readQuestionFile({ name: path.split('/').pop()!, bytes: fixture(path) }, { readAt, format })
     for (const bank of reading.banks) {
       const valid = validate(JSON.parse(JSON.stringify(bank)))
       expect(validate.errors ?? []).toEqual([])

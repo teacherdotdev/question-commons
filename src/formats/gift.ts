@@ -302,6 +302,7 @@ function detect(input: FormatInput): number {
 
 export const gift: FormatSpec = {
   id: 'gift',
+  shape: 'text',
   detect,
   parse: (input) => parseGift(input.text()),
 }

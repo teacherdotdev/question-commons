@@ -107,6 +107,7 @@ async function detect(input: FormatInput): Promise<number> {
 
 export const kahoot: FormatSpec = {
   id: 'kahoot',
+  shape: 'table',
   detect,
   parse: async (input) => parseKahootRows((await readSheet(input))?.rows ?? []),
 }

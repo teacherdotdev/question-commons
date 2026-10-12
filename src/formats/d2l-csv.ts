@@ -201,6 +201,7 @@ async function detect(input: FormatInput): Promise<number> {
 
 export const d2lCsv: FormatSpec = {
   id: 'd2l-csv',
+  shape: 'table',
   detect,
   parse: async (input) => parseD2lRows((await readSheet(input))?.rows ?? []),
 }

@@ -47,7 +47,7 @@ const choices = (question: Question | undefined) =>
 describe('Canvas classic quiz export', () => {
   test('reads every question type once, with the picture the package carries', async () => {
     const { reading, bank, questions } = await read('unit-1-science-quiz-export.zip', await folder('canvas-export'))
-    expect(reading.format).toBe('qti')
+    expect(reading.format).toBe('qti-package')
     expect(bank.name).toBe('Unit 1 Science Quiz')
     expect(questions.map((question) => question.type)).toEqual([
       'multiple-choice', 'true-false', 'fill-in-the-blank', 'fill-in-the-blank', 'multiple-answer', 'fill-in-the-blank',
@@ -84,7 +84,7 @@ describe('Canvas classic quiz export', () => {
 
   test('the quiz alone, as a bare .xml, leaves out the question whose picture is in the package', async () => {
     const { reading, questions } = await read('g8f3c2a.xml', fixture('canvas-export/g8f3c2a/g8f3c2a.xml'))
-    expect(reading.format).toBe('qti')
+    expect(reading.format).toBe('qti-xml')
     expect(questions).toHaveLength(8)
     expect(reading.issues.find((issue) => issue.code === 'picture-missing')?.message).toStartWith('Question 1:')
   })
@@ -93,7 +93,7 @@ describe('Canvas classic quiz export', () => {
 describe('QTI 2.1 and 2.2 items', () => {
   test('a bare item whose picture is not in it comes back with no questions, saying why', async () => {
     const { reading, questions } = await read('choice.xml', fixture('qti21-choice.xml'))
-    expect(reading.format).toBe('qti')
+    expect(reading.format).toBe('qti-xml')
     expect(questions).toEqual([])
     expect(reading.issues.map((issue) => issue.code)).toEqual(['picture-missing'])
   })
@@ -143,7 +143,7 @@ describe('QTI 2.1 and 2.2 items', () => {
       'items/match.xml': fixture('qti21-match.xml'),
       'items/images/sign.png': PNG,
     }))
-    expect(reading.format).toBe('qti')
+    expect(reading.format).toBe('qti-package')
     expect(bank.name).toBe('English reading check')
     expect(questions.map((question) => question.type)).toEqual(['multiple-choice', 'matching'])
     expect(Object.keys(reading.pictures)).toHaveLength(1)
@@ -207,7 +207,7 @@ describe('QTI 3.0 items', () => {
 describe('QTI safety', () => {
   test('Moodle XML is not QTI', async () => {
     const reading = await readQuestionFile({ name: 'quiz.xml', bytes: encode('<?xml version="1.0"?><quiz><question type="essay"><questiontext><text>Why?</text></questiontext></question></quiz>') }).catch(() => null)
-    expect(reading?.format ?? null).not.toBe('qti')
+    expect(reading?.format ?? null).not.toBe('qti-xml')
   })
 
   test('an external entity is never expanded, and a script does not survive', async () => {
@@ -229,7 +229,7 @@ describe('QTI safety', () => {
   </assessment>
 </questestinterop>`
     const { reading, questions } = await read('hostile.xml', encode(xml))
-    expect(reading.format).toBe('qti')
+    expect(reading.format).toBe('qti-xml')
     expect(questions).toHaveLength(2)
     const json = JSON.stringify(questions)
     expect(json).not.toContain('root:')

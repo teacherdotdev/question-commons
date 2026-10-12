@@ -10,8 +10,12 @@ Question Commons reads question files written for other tools into one unified, 
 A file of questions written for another tool, such as a Kahoot or Blooket spreadsheet, a Canvas or Moodle export, or a Respondus text, or pasted text in one of those layouts.
 _Avoid_: Foreign format, LMS export, legacy import, upload
 
+**Shape**:
+What a Question File is once its packaging is set aside: Text, a Table, XML, or a Package of files. One Shape arrives many ways — a Table as a CSV or an Excel workbook, Text as a text file, a Word document or a paste — and one file may be more than one Shape, as tab-separated text is both Text and a Table.
+_Avoid_: File type, extension, container
+
 **Format**:
-One documented layout of Question File, named as teachers know it, such as “Kahoot spreadsheet” or “Moodle GIFT”.
+One originator's documented layout of questions, read from one Shape, and named as teachers know it, such as “Kahoot spreadsheet” (a Table) or “Moodle GIFT” (Text). The originator is the tool that writes the layout or defines and imports it. A layout no tool defines, such as a table with columns of a teacher's own choosing, is not a Format.
 _Avoid_: File type, parser, flavour
 
 **Reading**:

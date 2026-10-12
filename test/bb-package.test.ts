@@ -41,7 +41,7 @@ describe('Blackboard 5 pool, as the Blackboard Test Generator downloads one', ()
       },
     ]) {
       const { reading, bank, questions } = await read(name, bytes)
-      expect(reading.format).toBe('bb-package')
+      expect(reading.format).toBe(name.endsWith('.dat') ? 'bb-xml' : 'bb-package')
       expect(bank.name).toBe('Number facts')
       expect(bank.description).toBe('Small number questions.')
       expect(questions.map((question) => question.type)).toEqual([
@@ -136,9 +136,9 @@ describe('Blackboard QTI pool and test export', () => {
   test('a Blackboard export and a bare pool .dat go to Blackboard’s reader, not QTI’s', async () => {
     const { reading } = await read('export.zip', await exportZip())
     expect(reading.candidates[0]!.format).toBe('bb-package')
-    expect(reading.candidates.find((candidate) => candidate.format === 'qti')?.score ?? 0).toBeLessThan(0.3)
+    expect(reading.candidates.find((candidate) => candidate.format === 'qti-package')?.score ?? 0).toBeLessThan(0.3)
     const dat = await read('res00001.dat', pool())
-    expect(dat.reading.format).toBe('bb-package')
+    expect(dat.reading.format).toBe('bb-xml')
   })
 })
 

@@ -308,6 +308,7 @@ function detect(input: FormatInput): number {
 
 export const bbGenerator: FormatSpec = {
   id: 'bb-generator',
+  shape: 'text',
   detect,
   parse: (input) => parseBbGenerator(input.text()),
 }

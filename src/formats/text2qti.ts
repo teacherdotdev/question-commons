@@ -524,6 +524,7 @@ function detect(input: FormatInput): number {
 
 export const text2qti: FormatSpec = {
   id: 'text2qti',
+  shape: 'text',
   detect,
   parse: (input) => parseText2qti(input.text()),
 }

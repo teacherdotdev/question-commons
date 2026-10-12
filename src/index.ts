@@ -1,23 +1,25 @@
-import { FORMAT_LABELS } from './catalog'
-import { FORMATS } from './formats'
+import { formatInfo } from './catalog'
+import { READERS } from './formats'
 import type { Picture, QuestionBank } from './question-bank'
-import type { FormatId, FormatInput, FormatSpec, ZipFiles } from './reader'
+import type { FormatId, FormatInput, FormatSpec, Shape, ZipFiles } from './reader'
 import { decodeText } from './text'
 import { unify, type ImportIssue } from './unify'
 import { wordText } from './formats/docx'
 import { readZip, zipFile, ZipLimitError } from './zip'
 
 export * from './question-bank'
-export type { FormatId } from './reader'
+export type { FormatId, Shape } from './reader'
 export type { ImportIssue } from './unify'
-export { FORMAT_LABELS, QUESTION_FILE_EXTENSIONS, SUPPORTED_SOURCES, isQuestionFileName } from './catalog'
+export { FORMATS, QUESTION_FILE_EXTENSIONS, isQuestionFileName, type FormatInfo } from './catalog'
 export { blocksText as plainText } from './rich-text'
 
 /**
- * Reading a Question File into Question Banks with rules alone (ADR-0004):
- * the file is scored against every Format, read with the few that score
- * best, and the Reading that brings in the most wins. The other Formats it
- * could be are offered, so an app can let a teacher read it as another.
+ * Reading a Question File into Question Banks with rules alone (ADR-0004),
+ * in two steps (ADR-0006). The file is set into every Shape it fits — a Word
+ * document is Text, an Excel workbook a Table — and then scored against
+ * every Format of those Shapes and read with the few that score best. The
+ * Reading that brings in the most wins. The other Formats it could be are
+ * offered, so an app can let a teacher read it as another.
  */
 
 export type FormatCandidate = { format: FormatId; label: string; score: number }
@@ -52,7 +54,11 @@ export class QuestionFileError extends Error {
   }
 }
 
-async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput & { word: boolean }> {
+type Input = FormatInput & { word: boolean; shapes: Shape[] }
+
+const looksLikeXml = (text: string) => /^\s*</.test(text)
+
+async function inputOf(name: string, bytes: Uint8Array): Promise<Input> {
   let zip: ZipFiles | null
   try {
     zip = await readZip(bytes)
@@ -63,7 +69,16 @@ async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput & {
   // A Word document is read as its text, as if typed into a text file.
   const word = Boolean(zip && zipFile(zip, 'word/document.xml'))
   const text = zip ? (word ? await wordText(zip) : '') : decodeText(bytes).text
-  return { name, bytes, word, text: () => text, zip: async () => zip }
+  // A workbook is a Table and any other archive a Package. Text that isn't
+  // XML may be a Table as well, as tab-separated cells are.
+  const shapes: Shape[] = word
+    ? ['text']
+    : zip
+      ? [zipFile(zip, 'xl/workbook.xml') ? 'table' : 'package']
+      : looksLikeXml(text)
+        ? ['xml']
+        : ['text', 'table']
+  return { name, bytes, word, shapes, text: () => text, zip: async () => (word ? null : zip) }
 }
 
 const MIN_CONFIDENCE = 0.5
@@ -92,16 +107,18 @@ async function tryFormat(format: FormatSpec, input: FormatInput, score: number, 
   }
 }
 
-async function candidatesFor(input: FormatInput): Promise<FormatCandidate[]> {
+const readersFor = (input: Input) => READERS.filter((reader) => input.shapes.includes(reader.shape))
+
+async function candidatesFor(input: Input): Promise<FormatCandidate[]> {
   const scored = await Promise.all(
-    FORMATS.map(async (format) => {
+    readersFor(input).map(async (format) => {
       let score = 0
       try {
         score = await format.detect(input)
       } catch {
         score = 0
       }
-      return { format: format.id, label: FORMAT_LABELS[format.id], score: Math.max(0, Math.min(1, score)) }
+      return { format: format.id, label: formatInfo(format.id).label, score: Math.max(0, Math.min(1, score)) }
     }),
   )
   // Stable: Formats listed first win a tie.
@@ -118,14 +135,17 @@ export async function readQuestionFile(
 
   let best: Trial | null = null
   if (options.format) {
-    const format = FORMATS.find(({ id }) => id === options.format)
+    const format = READERS.find(({ id }) => id === options.format)
     if (!format) throw new QuestionFileError('That format is not one this package reads.', 'not-recognized')
+    if (!input.shapes.includes(format.shape)) {
+      throw new QuestionFileError(`This file can’t be read as ${formatInfo(format.id).label}.`, 'no-questions')
+    }
     const score = candidates.find((candidate) => candidate.format === format.id)?.score ?? 0
     best = await tryFormat(format, input, Math.max(score, 0.5), readAt)
     if (!best || !best.found) {
       const first = best?.issues[0]
       throw new QuestionFileError(
-        `No questions could be read from this file as ${FORMAT_LABELS[format.id]}.` +
+        `No questions could be read from this file as ${formatInfo(format.id).label}.` +
           (first ? ` The first problem: ${first.message}` : ''),
         'no-questions',
       )
@@ -135,7 +155,7 @@ export async function readQuestionFile(
       candidates
         .filter(({ score }) => score >= 0.3)
         .slice(0, 3)
-        .map((candidate) => tryFormat(FORMATS.find(({ id }) => id === candidate.format)!, input, candidate.score, readAt)),
+        .map((candidate) => tryFormat(READERS.find(({ id }) => id === candidate.format)!, input, candidate.score, readAt)),
     )
     for (const trial of trials) {
       if (trial && (!best || trial.confidence > best.confidence + 1e-9)) best = trial
@@ -160,6 +180,6 @@ export async function readQuestionFile(
     issues: best.issues,
     pictures: best.pictures,
     format: best.format.id,
-    candidates: candidates.length ? candidates : [{ format: best.format.id, label: FORMAT_LABELS[best.format.id], score: best.confidence }],
+    candidates: candidates.length ? candidates : [{ format: best.format.id, label: formatInfo(best.format.id).label, score: best.confidence }],
   }
 }

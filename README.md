@@ -60,17 +60,38 @@ npm install @teacherdotdev/question-commons
 </tr>
 </table>
 
-## Reads the files teachers already have
+## Reads the files teachers' tools write
 
-17 formats, each recognised by its own markers and read by its own parser.
+Each Format is one tool's own layout: a file the tool exports, or a syntax it defines and imports. A file is first set
+into its Shape, so an Excel workbook and a CSV are the same Table and a Word document is Text, and then read by every
+Format of that Shape ([ADR-0006](docs/adr/0006-read-only-layouts-a-tool-defines.md)). A table laid out a teacher's own
+way isn't a Format; copy it into a template a Format reads, such as Kahoot's or Class Gauntlet's. Quizlet's export, which
+any two-column file looks like, is read only when an app asks for it.
 
-| Learning platforms | Classroom games | Test makers and text |
-| --- | --- | --- |
-| Canvas | Kahoot | Respondus text and CSV |
-| Moodle XML, GIFT and Aiken | Blooket | Blackboard Test Generator |
-| Blackboard pools, exports and uploads | Class Gauntlet | text2qti |
-| Brightspace (D2L) | Quizlet and Anki | CSV and Excel spreadsheets |
-| QTI 1.2, 2.x and 3.0 | | Word documents |
+<!-- formats: written by `bun run docs` from src/catalog.ts -->
+
+| Shape | Format | Originator | File types |
+| --- | --- | --- | --- |
+| Table | Blackboard upload file (tab-delimited) | Blackboard | `.txt` `.tsv` `.tab` |
+| Table | Brightspace (D2L) question CSV | Brightspace (D2L) | `.csv` |
+| Table | Respondus CSV | Respondus | `.csv` `.txt` |
+| Table | Blooket spreadsheet | Blooket | `.csv` `.xlsx` |
+| Table | Class Gauntlet spreadsheet | Class Gauntlet | `.csv` `.tsv` `.txt` `.xlsx` |
+| Table | Kahoot spreadsheet | Kahoot | `.xlsx` `.csv` |
+| Table | Quizlet export | Quizlet | `.txt` |
+| Text | Blackboard Test Generator text | Blackboard Test Generator | `.txt` `.text` `.docx` |
+| Text | Respondus Standard text | Respondus | `.txt` `.docx` |
+| Text | Aiken | Moodle | `.txt` `.aiken` `.docx` |
+| Text | text2qti | text2qti | `.txt` `.md` |
+| Text | Moodle GIFT | Moodle | `.gift` `.txt` `.docx` |
+| Text | Anki export | Anki | `.txt` |
+| XML | Blackboard pool file | Blackboard | `.dat` `.xml` |
+| XML | QTI XML (Canvas, Brightspace, Blackboard and others) | IMS QTI | `.xml` `.qti` |
+| XML | Moodle XML | Moodle | `.xml` |
+| Package | Blackboard pool or test export | Blackboard | `.zip` |
+| Package | QTI package (Canvas, Brightspace, Blackboard and others) | IMS QTI | `.zip` `.imscc` |
+
+<!-- /formats -->
 
 ## How it reads
 

@@ -143,6 +143,7 @@ function detect(input: FormatInput): number {
 
 export const bbTsv: FormatSpec = {
   id: 'bb-tsv',
+  shape: 'table',
   detect,
   parse: (input) => parseBbTsv(input.text()),
 }

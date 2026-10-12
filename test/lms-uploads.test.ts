@@ -87,12 +87,11 @@ describe('Blackboard upload file (tab-delimited)', () => {
     ])
   })
 
-  test('is not mistaken for Respondus CSV, flashcards or a spreadsheet', async () => {
+  test('is not mistaken for Respondus CSV or Quizlet', async () => {
     const { reading } = await read('bb.txt', encode('MC\tWhat is 2 + 2?\t3\tincorrect\t4\tcorrect\nTF\tThe sky is blue.\ttrue\n'))
     expect(reading.format).toBe('bb-tsv')
     const score = (format: string) => reading.candidates.find((candidate) => candidate.format === format)?.score ?? 0
     expect(score('respondus-csv')).toBeLessThan(0.5)
-    expect(score('flashcards')).toBe(0)
-    expect(score('spreadsheet')).toBe(0)
+    expect(score('quizlet')).toBe(0)
   })
 })

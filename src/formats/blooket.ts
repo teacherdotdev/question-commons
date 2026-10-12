@@ -95,6 +95,7 @@ async function detect(input: FormatInput): Promise<number> {
 
 export const blooket: FormatSpec = {
   id: 'blooket',
+  shape: 'table',
   detect,
   parse: async (input) => parseBlooketRows((await readSheet(input))?.rows ?? []),
 }

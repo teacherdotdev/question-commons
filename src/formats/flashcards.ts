@@ -1,13 +1,16 @@
 import { htmlBlocks, plainBlocks, richBlocks } from '../rich-text'
-import { delimitedRows, excerpt, plainStructure } from '../text'
+import { delimitedRows, excerpt } from '../text'
 import { BLANK_MARK, type Blocks, type ReaderQuestion, type FormatInput, type FormatSpec, type ImportIssue, type ParseResult } from '../reader'
 
 /**
- * Flashcards exported as text: one card to a line, its term and definition
- * separated by a tab (Quizlet's default), a comma, a semicolon, or a dash
- * (Quizlet's “custom” separator, ` - `). Quizlet can also put the cards on
- * one line, separated by semicolons. Each card becomes a Short Answer
- * question: the term is asked, and the definition is its Suggested Answer.
+ * Flashcards exported as text, by Quizlet or Anki. Each card becomes a Short
+ * Answer question: the term is asked, and the definition is its Suggested
+ * Answer.
+ *
+ * Quizlet's export is one card to a line, its term and definition separated
+ * by a tab (its default) or a comma. Its custom separators can't be split
+ * reliably, as a card may hold them, and are not read. Any two-column file
+ * looks like one, so it is read only when an app asks for it (ADR-0006).
  *
  * Anki's text export adds header lines — `#separator:Tab`, `#html:true`,
  * `#columns:…`, `#deck:…`, `#tags:…` and the `#… column:N` lines naming its
@@ -15,24 +18,13 @@ import { BLANK_MARK, type Blocks, type ReaderQuestion, type FormatInput, type Fo
  * cloze note, `The capital of France is {{c1::Paris}}.`, becomes a Fill in
  * the Blank question whose Blank, where the cloze stood, holds `Paris`.
  *
- * Any two-column table would fit this description, so without Anki's
- * headers it scores below every format that says more about itself.
+ * Its header lines are what identify it.
  */
 
-type Separator = '\t' | ',' | ';' | ' - ' | '|' | ':' | ' '
-type Layout = { rows: '\n' | ';'; fields: Separator }
+type Separator = '\t' | ',' | ';' | '|' | ':' | ' '
+type Layout = { fields: '\t' | ',' }
 
-const LAYOUTS: Layout[] = [
-  { rows: '\n', fields: '\t' },
-  { rows: '\n', fields: ',' },
-  { rows: '\n', fields: ';' },
-  { rows: '\n', fields: ' - ' },
-  { rows: ';', fields: '\t' },
-  { rows: ';', fields: ',' },
-  { rows: ';', fields: ' - ' },
-]
-
-const BB_CODES = new Set(['MC', 'MA', 'TF', 'ESS', 'MAT', 'FIB', 'FIB_PLUS', 'NUM', 'ORD', 'FIL', 'SR', 'OP', 'EO'])
+const LAYOUTS: Layout[] = [{ fields: '\t' }, { fields: ',' }]
 
 const ANKI_SEPARATORS: Record<string, Separator> = {
   tab: '\t', comma: ',', semicolon: ';', space: ' ', pipe: '|', colon: ':',
@@ -86,29 +78,7 @@ function readAnkiHeader(lines: string[]): { anki: Anki | null; skip: number } {
 
 /** The cards, split the way `layout` says, with the line each starts on. */
 function rowsOf(text: string, layout: Layout): Row[] {
-  const lineAt = (offset: number) => text.slice(0, offset).split('\n').length
-  const pieces: { text: string; line: number }[] = []
-  if (layout.rows === '\n') {
-    if (layout.fields !== ' - ') {
-      return delimitedRows(text, layout.fields).filter((row) => row.fields.some((field) => field.trim()))
-    }
-    text.split('\n').forEach((line, index) => pieces.push({ text: line, line: index + 1 }))
-  } else {
-    let offset = 0
-    for (const piece of text.split(';')) {
-      pieces.push({ text: piece.replace(/^\s*\n/, ''), line: lineAt(offset + (piece.length - piece.trimStart().length)) })
-      offset += piece.length + 1
-    }
-  }
-  return pieces
-    .filter((piece) => piece.text.trim())
-    .map((piece) => {
-      if (layout.fields === ' - ') {
-        const at = piece.text.indexOf(' - ')
-        return { fields: at < 0 ? [piece.text] : [piece.text.slice(0, at), piece.text.slice(at + 3)], line: piece.line }
-      }
-      return { fields: piece.text.split(layout.fields), line: piece.line }
-    })
+  return delimitedRows(text, layout.fields).filter((row) => row.fields.some((field) => field.trim()))
 }
 
 const isCard = (row: Row) => row.fields.length === 2 && row.fields.every((field) => field.trim())
@@ -116,7 +86,7 @@ const isCard = (row: Row) => row.fields.length === 2 && row.fields.every((field)
 const HEADER = /^(term|terms|front|question|word|prompt)$/i
 const HEADER_BACK = /^(definition|definitions|back|answer|meaning)$/i
 
-type Reading = { rows: Row[]; layout: Layout | null; anki: Anki | null; share: number }
+type Reading = { rows: Row[]; anki: Anki | null; share: number }
 
 function read(text: string): Reading {
   const lines = text.split('\n')
@@ -124,21 +94,19 @@ function read(text: string): Reading {
   const body = '\n'.repeat(skip) + lines.slice(skip).join('\n')
   if (anki) {
     const separator = anki.separator ?? sniffAnki(body)
-    const rows = delimitedRows(body, separator === ' - ' ? '\t' : separator)
+    const rows = delimitedRows(body, separator)
       .filter((row) => row.fields.some((field) => field.trim()))
-    return { rows, layout: { rows: '\n', fields: separator }, anki, share: 1 }
+    return { rows, anki, share: 1 }
   }
-  let best: Reading = { rows: [], layout: null, anki: null, share: 0 }
+  let best: Reading = { rows: [], anki: null, share: 0 }
   for (const layout of LAYOUTS) {
     const rows = rowsOf(body, layout)
     if (rows.length && HEADER.test(rows[0]!.fields[0]?.trim() ?? '') && HEADER_BACK.test(rows[0]!.fields[1]?.trim() ?? '')) {
       rows.shift()
     }
     if (!rows.length) continue
-    // Rows on one line need several cards before a semicolon means a row.
-    if (layout.rows === ';' && rows.length < 3) continue
     const share = rows.filter(isCard).length / rows.length
-    if (share > best.share + 1e-9) best = { rows, layout, anki: null, share }
+    if (share > best.share + 1e-9) best = { rows, anki: null, share }
     if (share >= 0.9) break
   }
   return best
@@ -161,7 +129,7 @@ function card(row: Row, reading: Reading): ReaderQuestion | string {
   const [term = '', definition = ''] = sides
   if (!anki && !isCard(row)) {
     return row.fields.length < 2
-      ? 'it has no definition: a card is a term and a definition, separated by a tab, a comma or a dash.'
+      ? 'it has no definition: a card is a term and a definition, separated by a tab or a comma.'
       : `it has ${row.fields.length} parts, not a term and a definition.`
   }
   const blocks = (text: string): Blocks =>
@@ -214,23 +182,21 @@ export function parseFlashcards(text: string): ParseResult {
   return { questions, issues, found: reading.rows.length, ...(deck ? { name: deck } : {}) }
 }
 
-function detect(input: FormatInput): number {
-  const text = input.text()
-  if (!text.trim()) return 0
-  // Enough cards to tell, not a whole large file read seven ways.
-  const sample = text.length > 64 * 1024 ? text.slice(0, text.lastIndexOf('\n', 64 * 1024) + 1 || 64 * 1024) : text
-  const reading = read(sample)
-  if (!reading.rows.length) return 0
-  if (reading.anki) return 0.98
-  const coded = reading.rows.filter((row) => BB_CODES.has(plainStructure(row.fields[0] ?? '').trim().toUpperCase())).length
-  if (coded / reading.rows.length > 0.2) return 0
-  // Brightspace's key/value rows are two cells too; `NewQuestion` is theirs.
-  if (reading.rows.some((row) => /^newquestion$/i.test(plainStructure(row.fields[0] ?? '').trim()))) return 0
-  return reading.share >= 0.9 ? 0.5 + 0.25 * reading.share : reading.share * 0.3
+/** Only Anki's header lines say a file is Anki's. */
+function detectAnki(input: FormatInput): number {
+  return readAnkiHeader(input.text().split('\n', 32)).anki ? 0.98 : 0
 }
 
-export const flashcards: FormatSpec = {
-  id: 'flashcards',
-  detect,
+export const anki: FormatSpec = {
+  id: 'anki',
+  shape: 'text',
+  detect: detectAnki,
+  parse: (input) => parseFlashcards(input.text()),
+}
+
+export const quizlet: FormatSpec = {
+  id: 'quizlet',
+  shape: 'table',
+  detect: () => 0,
   parse: (input) => parseFlashcards(input.text()),
 }

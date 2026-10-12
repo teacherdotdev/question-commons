@@ -9,22 +9,31 @@ import type { RichText } from './question-bank'
  */
 
 export type FormatId =
-  | 'bb-generator'
-  | 'bb-tsv'
   | 'bb-package'
-  | 'qti'
+  | 'qti-package'
+  | 'bb-xml'
+  | 'qti-xml'
   | 'moodle-xml'
-  | 'gift'
-  | 'aiken'
-  | 'respondus'
-  | 'text2qti'
+  | 'bb-tsv'
   | 'd2l-csv'
   | 'respondus-csv'
-  | 'kahoot'
   | 'blooket'
   | 'class-gauntlet'
-  | 'spreadsheet'
-  | 'flashcards'
+  | 'kahoot'
+  | 'quizlet'
+  | 'bb-generator'
+  | 'respondus'
+  | 'aiken'
+  | 'text2qti'
+  | 'gift'
+  | 'anki'
+
+/**
+ * What a Question File is once its packaging is set aside (ADR-0006): Text
+ * (a text file, a paste, a Word document), a Table (a CSV, tab-separated
+ * text, an Excel workbook), XML, or a Package of files (a .zip).
+ */
+export type Shape = 'text' | 'table' | 'xml' | 'package'
 
 /** Blocks of rich text, as a Question Bank Record's documents hold them. */
 export type Blocks = RichText
@@ -142,9 +151,12 @@ export type FormatInput = {
 export type ZipFiles = Map<string, Uint8Array>
 
 export type FormatSpec = {
-  /** Its name for a teacher is in `catalog.ts`, kept apart so a drop zone
-   *  can list formats without loading their parsers. */
+  /** Its name for a teacher, originator and file types are in `catalog.ts`,
+   *  kept apart so a drop zone can list formats without loading their
+   *  parsers. */
   id: FormatId
+  /** The one Shape it reads: it is offered only files of that Shape. */
+  shape: Shape
   /** How likely this file is in the format, from 0 to 1. It looks, never
    *  parses in full; parsing confirms. */
   detect: (input: FormatInput) => Promise<number> | number

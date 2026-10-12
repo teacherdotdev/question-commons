@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import JSZip from 'jszip'
-import { plainText, readQuestionFile } from '../src'
+import { FORMATS, plainText, readQuestionFile } from '../src'
 import { readAt } from './helpers'
 
 /**
@@ -146,5 +146,13 @@ describe('Word documents written in a text Format', () => {
     const zip = new JSZip()
     zip.file('word/document.xml', '<w:document><w:body><w:p>')
     await expect(readQuestionFile({ name: 'broken.docx', bytes: await zip.generateAsync({ type: 'uint8array' }) })).rejects.toThrow('Word document')
+  })
+
+  test('is offered only to Formats that read Text', async () => {
+    const bytes = await docx(['What is 2 + 2?', 'A. 3', 'B. 4', 'ANSWER: B'])
+    const reading = await readQuestionFile({ name: 'quiz.docx', bytes }, { readAt })
+    expect(reading.format).toBe('aiken')
+    const shapes = new Set(reading.candidates.map((candidate) => FORMATS.find((format) => format.id === candidate.format)!.shape))
+    expect([...shapes]).toEqual(['text'])
   })
 })

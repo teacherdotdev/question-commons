@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { plainText, readQuestionFile, type Question } from '../src'
+import { FORMATS, plainText, readQuestionFile, type Question } from '../src'
 import { fixture, readAt } from './helpers'
 import { xlsx } from './test-xlsx'
 
@@ -13,68 +13,21 @@ const choices = (question: Question | undefined) =>
     ? question.choices.map((choice) => [plainText(choice.content), choice.correct])
     : null
 
-describe('Spreadsheet of questions', () => {
-  test('reads a teacher’s table by its headers, whatever form the right answer takes', async () => {
-    const { reading, questions } = await read('questions.csv', fixture('spreadsheet/questions.csv'))
-    expect(reading.format).toBe('spreadsheet')
-    expect(questions.map((question) => question.type)).toEqual([
-      'multiple-choice', 'multiple-answer', 'true-false', 'fill-in-the-blank', 'multiple-choice',
-    ])
-    const [sum, even, water, ocean, gas] = questions
-    expect(choices(sum)).toEqual([['3', false], ['4', true], ['5', false], ['6', false]])
-    expect(sum!.topics).toEqual(['Arithmetic'])
-    expect(even?.type === 'multiple-answer' && even.choices.map((choice) => choice.correct)).toEqual([true, false, true, false])
-    expect(water?.type === 'true-false' && water.answer).toBe(true)
-    expect(ocean?.type === 'fill-in-the-blank' && ocean.blanks).toEqual([{ accepted: ['Pacific'] }])
-    expect(gas?.type === 'multiple-choice' && gas.choices.map((choice) => choice.correct)).toEqual([false, true, false])
-    expect(reading.issues).toEqual([expect.objectContaining({
-      message: 'Question 6 (line 7): its correct answer “3” is not one of its options, their letter or their number.',
-    })])
-  })
-
-  test('reads an .xlsx whose options are the wrong answers, the right one apart', async () => {
+describe('A table laid out a teacher’s own way', () => {
+  // No tool defines its columns, so no Format reads it (ADR-0006).
+  test('is not read, however question-like its headers', async () => {
+    const csv = [
+      'Question,Type,Option A,Option B,Option C,Option D,Correct Answer,Explanation,Topic',
+      'What is 2 + 2?,,3,4,5,6,B,Basic addition,Arithmetic',
+    ].join('\n')
+    await expect(read('questions.csv', encode(csv))).rejects.toThrow('No questions written in a format')
     const bytes = await xlsx({
       rows: [
-        ['My chemistry quiz'],
-        ['Prompt', 'Correct Answer', 'Incorrect Answer 1', 'Incorrect Answer 2', 'Tags'],
-        ['Symbol for gold?', 'Au', 'Ag', 'Gd', 'chemistry; elements'],
-        ['Number of protons in carbon?', 6, 12, 8, 'chemistry'],
+        ['Prompt', 'Correct Answer', 'Incorrect Answer 1', 'Incorrect Answer 2'],
+        ['Symbol for gold?', 'Au', 'Ag', 'Gd'],
       ],
     })
-    const { reading, questions } = await read('chem.xlsx', bytes)
-    expect(reading.format).toBe('spreadsheet')
-    expect(choices(questions[0])).toEqual([['Au', true], ['Ag', false], ['Gd', false]])
-    expect(questions[0]!.topics).toEqual(['chemistry', 'elements'])
-    expect(choices(questions[1])).toEqual([['6', true], ['12', false], ['8', false]])
-  })
-
-  test('reads a type column and numbered options, and leaves out a type it cannot read from a spreadsheet', async () => {
-    const { reading, questions } = await read('quiz.csv', encode([
-      'Question Text,Question Type,Choice 1,Choice 2,Choice 3,Answer',
-      'Describe the water cycle.,Essay,,,,Evaporation then condensation then rain',
-      'Pick the mammal.,MC,Shark,Whale,Trout,2',
-      'Is ice cold?,T/F,,,,T',
-      'Match these.,Matching,,,,',
-    ].join('\n')))
-    expect(questions.map((question) => question.type)).toEqual(['short-answer', 'multiple-choice', 'true-false'])
-    expect(questions[0]?.type === 'short-answer' && plainText(questions[0].suggestedAnswer!)).toBe('Evaporation then condensation then rain')
-    expect(reading.issues).toEqual([expect.objectContaining({
-      message: 'Question 4 (line 5): “Matching” questions can’t be read from a spreadsheet, so it was left out.',
-    })])
-  })
-
-  test('a table with no question column is not a spreadsheet of questions', async () => {
-    await expect(read('grades.csv', encode('Name,Score,Grade\nAda,98,A\nBob,71,C\n'))).rejects.toThrow('No questions written in a format')
-  })
-
-  test('keeps a Points or Marks column as written', async () => {
-    const { questions } = await read('quiz.csv', encode([
-      'Question,Option A,Option B,Answer,Marks',
-      'Pick the mammal.,Shark,Whale,B,2',
-      'Pick the bird.,Robin,Trout,A,0.5',
-      'Pick the fish.,Trout,Robin,A,',
-    ].join('\n')))
-    expect(questions.map((question) => question.points)).toEqual([2, 0.5, undefined])
+    await expect(read('chem.xlsx', bytes)).rejects.toThrow('No questions written in a format')
   })
 })
 
@@ -114,6 +67,8 @@ describe('Kahoot spreadsheet', () => {
     const { reading, questions } = await read('kahoot.xlsx', bytes)
     expect(reading.format).toBe('kahoot')
     expect(questions.map((question) => question.type)).toEqual(['multiple-choice', 'multiple-answer', 'true-false'])
+    // An Excel workbook is a Table, and only Formats that read one are offered it.
+    expect(reading.candidates.every((candidate) => FORMATS.find((format) => format.id === candidate.format)!.shape === 'table')).toBe(true)
     const [capital, prime, flat] = questions
     expect(plainText(capital!.stem)).toBe('What is the capital of France?')
     expect(choices(capital)).toEqual([['London', false], ['Paris', true], ['Rome', false], ['Berlin', false]])

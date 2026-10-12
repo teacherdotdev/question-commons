@@ -1031,8 +1031,18 @@ export async function parseQti(input: FormatInput): Promise<ParseResult> {
   return gatherer.result(name)
 }
 
-export const qti: FormatSpec = {
-  id: 'qti',
+/** One QTI file on its own: a 1.2 `questestinterop`, or a 2.x or 3.0 item. */
+export const qtiXml: FormatSpec = {
+  id: 'qti-xml',
+  shape: 'xml',
+  detect,
+  parse: parseQti,
+}
+
+/** A QTI package: a .zip or .imscc of QTI files, usually with a manifest. */
+export const qtiPackage: FormatSpec = {
+  id: 'qti-package',
+  shape: 'package',
   detect,
   parse: parseQti,
 }
