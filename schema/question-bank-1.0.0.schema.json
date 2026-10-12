@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/teacherdotdev/question-banks/schema/question-bank-1.0.0.schema.json",
+  "$id": "https://questioncommons.com/schema/question-bank-1.0.0.schema.json",
   "title": "Question Bank 1.0.0",
   "description": "A named group of Questions read from a Question File into the unified form (ADR-0001). Pictures are not inside it: rich text names them by key.",
   "type": "object",
   "additionalProperties": false,
   "required": ["format", "version", "name", "provenance", "questions"],
   "properties": {
-    "format": { "const": "teacherdotdev/question-bank" },
+    "format": { "const": "question-commons/question-bank" },
     "version": { "const": "1.0.0" },
     "name": { "type": "string", "minLength": 1 },
     "description": { "type": "string" },

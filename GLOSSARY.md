@@ -1,6 +1,6 @@
-# Question Banks
+# Question Commons
 
-Question Banks reads question files written for other tools into one unified, unsaved form that any teacher.dev app can take in, such as Test Parrot and Class Gauntlet. It reads; what an app keeps, saves or plays is up to the app.
+Question Commons reads question files written for other tools into one unified, unsaved form that any teacher.dev app can take in, such as Test Parrot and Class Gauntlet. It reads; what an app keeps, saves or plays is up to the app.
 
 ## Language
 

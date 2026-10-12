@@ -11,8 +11,8 @@ describe('the built release', () => {
     expect(existsSync(`${root}/dist/index.d.ts`)).toBe(true)
 
     const script = `
-      import { readQuestionFile } from '@teacherdotdev/question-banks'
-      import schema from '@teacherdotdev/question-banks/schema.json' with { type: 'json' }
+      import { readQuestionFile } from '@question-commons/parser'
+      import schema from '@question-commons/parser/schema.json' with { type: 'json' }
       const bytes = new TextEncoder().encode('What is 2 + 2?\\nA. 3\\nB. 4\\nANSWER: B\\n')
       const reading = await readQuestionFile({ name: 'q.txt', bytes })
       console.log(JSON.stringify([reading.format, reading.banks[0].questions.length, schema.title]))

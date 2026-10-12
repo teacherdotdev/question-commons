@@ -7,11 +7,11 @@ import type { FormatId } from './reader'
  * carries them beside its banks, and rich text names them by key.
  */
 
-export const QUESTION_BANK_FORMAT = 'teacherdotdev/question-bank'
+export const QUESTION_BANK_FORMAT = 'question-commons/question-bank'
 export const QUESTION_BANK_VERSION = '1.0.0'
 
 /** The package that did the reading, recorded in every bank's Provenance. */
-export const READER = { name: '@teacherdotdev/question-banks', version: '0.1.0' } as const
+export const READER = { name: '@question-commons/parser', version: '0.1.0' } as const
 
 export type RichTextMark =
   | { type: 'strong' | 'emphasis' | 'inline-code' | 'strike' | 'subscript' | 'superscript' }

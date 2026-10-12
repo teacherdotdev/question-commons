@@ -1,9 +1,9 @@
 {
-  "name": "@teacherdotdev/question-banks",
+  "name": "@question-commons/parser",
   "version": "0.1.0",
   "description": "Reads question files written for other tools into one unified Question Bank form.",
   "license": "Apache-2.0",
-  "repository": "github:teacherdotdev/question-banks",
+  "repository": "github:teacherdotdev/question-commons",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

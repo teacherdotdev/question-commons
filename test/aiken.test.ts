@@ -10,7 +10,7 @@ describe('Aiken', () => {
     expect(reading.issues).toEqual([])
     expect(reading.banks).toHaveLength(1)
     const bank = reading.banks[0]!
-    expect(bank.format).toBe('teacherdotdev/question-bank')
+    expect(bank.format).toBe('question-commons/question-bank')
     expect(bank.version).toBe('1.0.0')
     expect(bank.name).toBe('Unit 3 planets')
     expect(bank.provenance).toMatchObject({ format: 'aiken', formatLabel: 'Aiken', fileName: 'Unit 3 planets.txt', readAt })

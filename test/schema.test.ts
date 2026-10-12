@@ -44,6 +44,6 @@ describe('the Question Bank schema', () => {
   })
 
   test('refuses a bank that does not follow it', () => {
-    expect(validate({ format: 'teacherdotdev/question-bank', version: '1.0.0', name: 'x', questions: [{ type: 'essay' }] })).toBe(false)
+    expect(validate({ format: 'question-commons/question-bank', version: '1.0.0', name: 'x', questions: [{ type: 'essay' }] })).toBe(false)
   })
 })
