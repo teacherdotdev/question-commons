@@ -11,7 +11,7 @@
 </p>
 
 ```bash
-npm install @question-commons/parser
+npm install @teacherdotdev/question-commons
 ```
 
 > v0.1, in development: not yet published to npm.
@@ -93,7 +93,7 @@ Schema, and every bank names the version it follows:
 https://questioncommons.com/schema/question-bank-1.0.0.schema.json.
 
 ```ts
-import { readQuestionFile } from '@question-commons/parser'
+import { readQuestionFile } from '@teacherdotdev/question-commons'
 
 const reading = await readQuestionFile({
   name: file.name,

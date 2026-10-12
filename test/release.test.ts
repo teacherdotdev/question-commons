@@ -11,8 +11,8 @@ describe('the built release', () => {
     expect(existsSync(`${root}/dist/index.d.ts`)).toBe(true)
 
     const script = `
-      import { readQuestionFile } from '@question-commons/parser'
-      import schema from '@question-commons/parser/schema.json' with { type: 'json' }
+      import { readQuestionFile } from '@teacherdotdev/question-commons'
+      import schema from '@teacherdotdev/question-commons/schema.json' with { type: 'json' }
       const bytes = new TextEncoder().encode('What is 2 + 2?\\nA. 3\\nB. 4\\nANSWER: B\\n')
       const reading = await readQuestionFile({ name: 'q.txt', bytes })
       console.log(JSON.stringify([reading.format, reading.banks[0].questions.length, schema.title]))
@@ -21,4 +21,12 @@ describe('the built release', () => {
     expect(node.stderr.toString()).toBe('')
     expect(JSON.parse(node.stdout.toString())).toEqual(['aiken', 1, 'Question Bank 1.0.0'])
   }, 60_000)
+})
+
+describe('the version', () => {
+  test('every bank records the package and version that read it, as package.json names them', async () => {
+    const pkg = await Bun.file(`${root}/package.json`).json()
+    const { READER } = await import('../src')
+    expect(READER).toEqual({ name: pkg.name, version: pkg.version })
+  })
 })

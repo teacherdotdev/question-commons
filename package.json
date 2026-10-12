@@ -1,9 +1,12 @@
 {
-  "name": "@question-commons/parser",
+  "name": "@teacherdotdev/question-commons",
   "version": "0.1.0",
   "description": "Reads question files written for other tools into one unified Question Bank form.",
   "license": "Apache-2.0",
-  "repository": "github:teacherdotdev/question-commons",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teacherdotdev/question-commons.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -31,5 +34,24 @@
     "ajv": "8.17.1",
     "ajv-formats": "3.0.1",
     "typescript": "^5.6.3"
-  }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "homepage": "https://questioncommons.com",
+  "keywords": [
+    "qti",
+    "moodle",
+    "gift",
+    "aiken",
+    "blackboard",
+    "canvas",
+    "kahoot",
+    "blooket",
+    "quizlet",
+    "question bank",
+    "quiz",
+    "education"
+  ]
 }

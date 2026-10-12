@@ -13,6 +13,6 @@ Test Parrot read fourteen Formats without AI (its ADR-0033), and Class Gauntlet 
 
 ## Consequences
 
-- The package is public and Apache-2.0, and apps install a tagged release from GitHub. A release tag holds the built JavaScript and its type definitions, so no app's build has to compile the package.
+- The package is public and Apache-2.0, published to npm as `@teacherdotdev/question-commons` with its built JavaScript and type definitions, so no app's build has to compile it. CI on `main` publishes each new version from GitHub Actions, with provenance and no stored npm token. (This replaced installing tagged releases from GitHub, once the `@teacherdotdev` npm org existed.)
 - The package only reads. Writing Formats, such as a Kahoot to Blooket converter, can be added later without changing the unified form.
 - The unified form has a versioned specification and JSON Schema, and every Question Bank names the version it follows, so an app can tell what a saved one means apart from the package release that read it.
