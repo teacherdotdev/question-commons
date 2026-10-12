@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/teacherdotdev/question-banks/schema/question-bank-1.0.0.schema.json",
+  "title": "Question Bank 1.0.0",
+  "description": "A named group of Questions read from a Question File into the unified form (ADR-0001). Pictures are not inside it: rich text names them by key.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "name", "provenance", "questions"],
+  "properties": {
+    "format": { "const": "teacherdotdev/question-bank" },
+    "version": { "const": "1.0.0" },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "author": { "type": "string" },
+    "license": { "type": "string" },
+    "extras": { "$ref": "#/$defs/extras" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format", "formatLabel", "fileName", "readAt", "reader"],
+      "properties": {
+        "format": { "type": "string", "minLength": 1 },
+        "formatLabel": { "type": "string", "minLength": 1 },
+        "fileName": { "type": "string" },
+        "readAt": { "type": "string", "format": "date-time" },
+        "reader": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+        }
+      }
+    },
+    "questions": { "type": "array", "items": { "$ref": "#/$defs/question" } }
+  },
+  "$defs": {
+    "extras": {
+      "description": "Facts the file carries that the unified form has no field for, under the names the file gave them (ADR-0005).",
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "richText": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "mark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["strong", "emphasis", "inline-code", "strike", "subscript", "superscript", "link"] },
+        "href": { "type": "string" },
+        "title": { "type": "string" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": [
+            "paragraph", "heading", "blockquote", "bullet-list", "ordered-list", "list-item", "code-block", "rule",
+            "table", "table-row", "table-cell", "text", "hard-break", "inline-math", "block-image", "blank"
+          ]
+        },
+        "content": { "$ref": "#/$defs/richText" },
+        "text": { "type": "string" },
+        "marks": { "type": "array", "items": { "$ref": "#/$defs/mark" } },
+        "level": { "type": "integer", "minimum": 1 },
+        "start": { "type": "integer" },
+        "language": { "type": "string" },
+        "source": { "type": "string", "description": "An inline-math node's LaTeX." },
+        "header": { "type": "boolean" },
+        "asset": { "type": "string", "description": "A block-image's key into the Reading's pictures." },
+        "alt": { "type": "string" }
+      }
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content", "correct"],
+      "properties": { "content": { "$ref": "#/$defs/richText" }, "correct": { "type": "boolean" } }
+    },
+    "question": {
+      "type": "object",
+      "required": ["type", "stem", "provenance"],
+      "properties": {
+        "type": {
+          "enum": [
+            "multiple-choice", "multiple-answer", "true-false", "matching", "fill-in-the-blank", "short-answer", "numeric", "ordering"
+          ]
+        },
+        "stem": { "$ref": "#/$defs/richText" },
+        "explanation": { "$ref": "#/$defs/richText" },
+        "topics": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "points": { "type": "number" },
+        "extras": { "$ref": "#/$defs/extras" },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["number"],
+          "properties": { "line": { "type": "integer", "minimum": 1 }, "number": { "type": "integer", "minimum": 1 } }
+        },
+        "choices": { "type": "array", "items": { "$ref": "#/$defs/choice" }, "minItems": 2 },
+        "answer": { "type": "boolean" },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["left", "right"],
+            "properties": {
+              "left": { "oneOf": [{ "$ref": "#/$defs/richText" }, { "type": "null" }] },
+              "right": { "oneOf": [{ "$ref": "#/$defs/richText" }, { "type": "null" }] }
+            }
+          }
+        },
+        "blanks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["accepted"],
+            "properties": {
+              "accepted": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+              "dropdown": { "const": true }
+            }
+          }
+        },
+        "suggestedAnswer": { "$ref": "#/$defs/richText" },
+        "answers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value"],
+            "properties": { "value": { "type": "string" }, "tolerance": { "type": "string" } }
+          }
+        },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/richText" } }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "enum": ["multiple-choice", "multiple-answer"] } } },
+          "then": {
+            "required": ["choices"],
+            "properties": { "choices": { "type": "array", "contains": { "type": "object", "properties": { "correct": { "const": true } } } } }
+          }
+        },
+        { "if": { "properties": { "type": { "const": "true-false" } } }, "then": { "required": ["answer"] } },
+        { "if": { "properties": { "type": { "const": "matching" } } }, "then": { "required": ["pairs"] } },
+        { "if": { "properties": { "type": { "const": "fill-in-the-blank" } } }, "then": { "required": ["blanks"] } },
+        { "if": { "properties": { "type": { "const": "numeric" } } }, "then": { "required": ["answers"] } },
+        { "if": { "properties": { "type": { "const": "ordering" } } }, "then": { "required": ["items"] } }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

@@ -8,7 +8,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
     "./schema.json": "./schema/question-bank-1.0.0.schema.json"
   },
   "files": ["dist", "schema"],
@@ -22,6 +25,8 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
     "typescript": "^5.6.3"
   }
 }
