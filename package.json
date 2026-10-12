@@ -25,10 +25,11 @@
     "test": "bun test",
     "check": "tsc --noEmit",
     "docs": "bun scripts/formats-table.ts",
-    "build": "rm -rf dist && bun build src/index.ts --outdir dist --target browser --format esm --external jszip && tsc -p tsconfig.build.json"
+    "build": "rm -rf dist && bun build src/index.ts --outdir dist --target browser --format esm --external jszip --external unpdf && tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "unpdf": "1.8.1"
   },
   "devDependencies": {
     "@types/bun": "latest",

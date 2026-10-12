@@ -13,4 +13,5 @@ test('the README lists the Formats exactly as the catalogue does (run `bun run d
 
 test('the table groups Formats by Shape, naming each one’s originator and file types', () => {
   expect(formatsTable()).toContain('| Table | Kahoot spreadsheet | Kahoot | `.xlsx` `.csv` |')
+  expect(formatsTable()).toContain('| PDF | Google Forms printout | Google Forms | `.pdf` |')
 })

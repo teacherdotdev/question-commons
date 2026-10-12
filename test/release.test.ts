@@ -16,10 +16,17 @@ describe('the built release', () => {
       const bytes = new TextEncoder().encode('What is 2 + 2?\\nA. 3\\nB. 4\\nANSWER: B\\n')
       const reading = await readQuestionFile({ name: 'q.txt', bytes })
       console.log(JSON.stringify([reading.format, reading.banks[0].questions.length, schema.title]))
+      // A PDF, read through unpdf, which is loaded only for one.
+      const { readFileSync } = await import('node:fs')
+      const pdf = new Uint8Array(readFileSync('test/fixtures/google-forms/all-types.pdf'))
+      const printout = await readQuestionFile({ name: 'all-types.pdf', bytes: pdf })
+      console.log(JSON.stringify([printout.format, printout.banks[0].name, printout.banks[0].questions.length, printout.issues.length]))
     `
     const node = Bun.spawnSync(['node', '--input-type=module', '-e', script], { cwd: root })
     expect(node.stderr.toString()).toBe('')
-    expect(JSON.parse(node.stdout.toString())).toEqual(['aiken', 1, 'Question Bank 1.0.0'])
+    const [text, printout] = node.stdout.toString().trim().split('\n').map((line) => JSON.parse(line))
+    expect(text).toEqual(['aiken', 1, 'Question Bank 1.0.0'])
+    expect(printout).toEqual(['google-forms-print', 'Every Question Type', 2, 10])
   }, 60_000)
 })
 

@@ -9,6 +9,7 @@ import { classGauntlet } from './class-gauntlet'
 import { d2lCsv } from './d2l-csv'
 import { anki, quizlet } from './flashcards'
 import { gift } from './gift'
+import { googleFormsPrint } from './google-forms'
 import { kahoot } from './kahoot'
 import { moodleXml } from './moodle-xml'
 import { qtiPackage, qtiXml } from './qti'
@@ -17,7 +18,7 @@ import { respondusCsv } from './respondus-csv'
 import { text2qti } from './text2qti'
 
 const readers = [
-  aiken, anki, bbGenerator, bbPackage, bbTsv, bbXml, blooket, classGauntlet, d2lCsv, gift, kahoot, moodleXml,
+  aiken, anki, bbGenerator, bbPackage, bbTsv, bbXml, blooket, classGauntlet, d2lCsv, gift, googleFormsPrint, kahoot, moodleXml,
   qtiPackage, qtiXml, quizlet, respondus, respondusCsv, text2qti,
 ]
 

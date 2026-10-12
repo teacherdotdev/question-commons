@@ -10,6 +10,9 @@ import { fixture, readAt } from './helpers'
 
 const root = fileURLToPath(new URL('./fixtures/', import.meta.url))
 
+/** Samples that hold no questions, so have no bank to check. */
+const EMPTY = ['google-forms/empty.headers.pdf', 'google-forms/empty.pdf']
+
 /** Every sample file that is itself a Question File (not a README, not a folder's part). */
 function sampleFiles(): string[] {
   const files: string[] = []
@@ -22,7 +25,7 @@ function sampleFiles(): string[] {
     }
   }
   walk(root)
-  return files.sort()
+  return files.filter((file) => !EMPTY.includes(file)).sort()
 }
 
 describe('the Question Bank schema', () => {

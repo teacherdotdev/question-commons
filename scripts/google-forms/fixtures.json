@@ -1,0 +1,91 @@
+{
+  "note": "Built by build.gs (buildFixtures) in a test Google account's Drive, folder \"Question Commons fixtures\", on 2026-10-12. Every FormApp call succeeded (no issues logged). 'deviations' lists differences found afterwards by reading the public viewform data (checked: tricky-text, untitled, media).",
+  "forms": [
+    {
+      "key": "mc-basic",
+      "id": "1wzbPRh8zUX33_BUB7ttXek6GGZ-MFvKuK9NuQyTE4_E"
+    },
+    {
+      "key": "all-types",
+      "id": "1Ai-uR1E76d8qR0eb9WoqPvj9WmSuL9k8FSRuyyj3tps"
+    },
+    {
+      "key": "long-quiz",
+      "id": "11CIcvCHYEzIrwXPuU0G_hDxaSvxCRlpBiB5svRFM1_c"
+    },
+    {
+      "key": "sections",
+      "id": "1tAI7YtNzsoRh1afEWAckHCzZeBFba6-iOZuctXUL0Yg"
+    },
+    {
+      "key": "survey",
+      "id": "1iphv6QDPl1aV5E_VULQYu_Qr2Y1mRKmCARRG0oLI7z4"
+    },
+    {
+      "key": "tricky-text",
+      "id": "1taarTCfz2AjvGCrOwFpv1ZXS5am7K-7Q-WakUwmwbGY",
+      "deviations": [
+        "Choice \"  padded  \" (question \"Trailing and   inner   spaces?  \") is stored trimmed as \"padded\"; the question title keeps its spaces."
+      ]
+    },
+    {
+      "key": "media",
+      "id": "1p414WBV-k2z06CPqs8rdWIq_I1_A1XQlMjyXpQ_vYSQ"
+    },
+    {
+      "key": "feedback",
+      "id": "1J6Sd6tbPiyKwq9wF5pQVIBgcyGa75k2IMjLnO12YNOg"
+    },
+    {
+      "key": "many-options",
+      "id": "1IEicS3D7RNtqW6xC7IFGQIiqyFFET1CygrdAPd-94JM"
+    },
+    {
+      "key": "other-option",
+      "id": "1OdtiJEjAayqglPjG06ZBq7V-7CXsEjOxfr-IuVKzAmg"
+    },
+    {
+      "key": "empty",
+      "id": "1AbHJisXwXJPl3ujKainJp-zSeBWRVlFYIMP_uccFZe8"
+    },
+    {
+      "key": "huge-stem",
+      "id": "1lghkrPJWQ4YAqtBwGrbAYQhFBNbfIKswKKXr6ZisHPo"
+    },
+    {
+      "key": "points-and-required",
+      "id": "1LlidcT42NKhheqm5v8gmk4vu3BSzQheNiWRstf8C7bY"
+    },
+    {
+      "key": "shuffled",
+      "id": "1zmMyx5s5MAHHp0rjyB45oLLMq-4ao3fS9y0cWL-Vig4"
+    },
+    {
+      "key": "untitled",
+      "id": "1VKH0l2llaH2SmMCH79E3hZtKmjOrCg9lhmxDldPluKE",
+      "deviations": [
+        "Form title is \"\" as specified, but the Drive file is named \"Untitled form\" (FormApp.create needs a name)."
+      ]
+    },
+    {
+      "key": "short-answers-tricky",
+      "id": "1avzXKZWStzL-udZJLUCsSs2Glox_Q0t1H3-KFRGgPmk"
+    },
+    {
+      "key": "long-description",
+      "id": "1WmIDPYGDXGrIqgDhTKSdkXb0smrHDvA3jElKmf7E8JA"
+    },
+    {
+      "key": "hundred-plus",
+      "id": "1VdSEqChDGBIcmzqHN79j9dJP-WmK9ic_2QymzcRyJQ8"
+    },
+    {
+      "key": "numbered-titles",
+      "id": "1wgW0N_dkMK9-3ZwjXb8KjG3_vEYsvuj8voVip9uq_MQ"
+    },
+    {
+      "key": "teacher-mix",
+      "id": "1JUYOwtf1cXExxqdjuz6fSP9w0H6_58oAtLkpi35mg9I"
+    }
+  ]
+}

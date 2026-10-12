@@ -7,6 +7,7 @@ test('every Format names its originator and the one Shape it reads', () => {
   expect(FORMATS.map((format) => [format.id, format.originator, format.shape])).toEqual([
     ['bb-package', 'Blackboard', 'package'],
     ['qti-package', 'IMS QTI', 'package'],
+    ['google-forms-print', 'Google Forms', 'pdf'],
     ['bb-xml', 'Blackboard', 'xml'],
     ['qti-xml', 'IMS QTI', 'xml'],
     ['moodle-xml', 'Moodle', 'xml'],
@@ -35,4 +36,5 @@ test('every Format says the file types it arrives as, and a file picker takes th
     for (const type of format.fileTypes) expect(QUESTION_FILE_EXTENSIONS).toContain(type)
   }
   expect(QUESTION_FILE_EXTENSIONS).toContain('.docx')
+  expect(FORMATS.find((format) => format.id === 'google-forms-print')).toMatchObject({ label: 'Google Forms printout', fileTypes: ['.pdf'] })
 })

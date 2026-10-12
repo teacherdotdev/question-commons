@@ -2,6 +2,7 @@ import { formatInfo } from './catalog'
 import { READERS } from './formats'
 import type { Picture, QuestionBank } from './question-bank'
 import type { FormatId, FormatInput, FormatSpec, Shape, ZipFiles } from './reader'
+import { isPdf, pdfPages } from './pdf'
 import { decodeText } from './text'
 import { unify, type ImportIssue } from './unify'
 import { wordText } from './formats/docx'
@@ -59,6 +60,9 @@ type Input = FormatInput & { word: boolean; shapes: Shape[] }
 const looksLikeXml = (text: string) => /^\s*</.test(text)
 
 async function inputOf(name: string, bytes: Uint8Array): Promise<Input> {
+  const pdf = () => pdfPages(bytes)
+  // A PDF is its printed pages, and nothing else.
+  if (isPdf(bytes)) return { name, bytes, word: false, shapes: ['pdf'], text: () => '', zip: async () => null, pdf }
   let zip: ZipFiles | null
   try {
     zip = await readZip(bytes)
@@ -78,10 +82,12 @@ async function inputOf(name: string, bytes: Uint8Array): Promise<Input> {
       : looksLikeXml(text)
         ? ['xml']
         : ['text', 'table']
-  return { name, bytes, word, shapes, text: () => text, zip: async () => (word ? null : zip) }
+  return { name, bytes, word, shapes, text: () => text, zip: async () => (word ? null : zip), pdf }
 }
 
 const MIN_CONFIDENCE = 0.5
+/** A Format's mark is unmistakable in a file that scores this. */
+const PLAINLY = 0.9
 
 type Trial = {
   format: FormatSpec
@@ -166,6 +172,12 @@ export async function readQuestionFile(
       best = trials.find((trial) => trial && trial.found > 0 && trial.score >= MIN_CONFIDENCE) ?? best
     }
     if (!best || (best.confidence < MIN_CONFIDENCE && !(best.found > 0 && best.score >= MIN_CONFIDENCE))) {
+      // A file plainly in a Format, such as an empty form's printout, that
+      // holds no questions at all.
+      const empty = trials.find((trial) => trial && trial.score >= PLAINLY && !trial.found)
+      if (empty) {
+        throw new QuestionFileError(`No questions were found in “${file.name}”, a ${formatInfo(empty.format.id).label}.`, 'no-questions')
+      }
       throw new QuestionFileError(
         input.word
           ? 'No questions written in a format this package knows were found in this Word document.'

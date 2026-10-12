@@ -1,3 +1,4 @@
+import type { PdfPage } from './pdf'
 import type { RichText } from './question-bank'
 
 /**
@@ -11,6 +12,7 @@ import type { RichText } from './question-bank'
 export type FormatId =
   | 'bb-package'
   | 'qti-package'
+  | 'google-forms-print'
   | 'bb-xml'
   | 'qti-xml'
   | 'moodle-xml'
@@ -31,9 +33,10 @@ export type FormatId =
 /**
  * What a Question File is once its packaging is set aside (ADR-0006): Text
  * (a text file, a paste, a Word document), a Table (a CSV, tab-separated
- * text, an Excel workbook), XML, or a Package of files (a .zip).
+ * text, an Excel workbook), XML, a Package of files (a .zip), or a PDF's
+ * printed pages (ADR-0007).
  */
-export type Shape = 'text' | 'table' | 'xml' | 'package'
+export type Shape = 'text' | 'table' | 'xml' | 'package' | 'pdf'
 
 /** Blocks of rich text, as a Question Bank Record's documents hold them. */
 export type Blocks = RichText
@@ -146,6 +149,8 @@ export type FormatInput = {
   text: () => string
   /** The files of a ZIP (a .zip, .docx or .xlsx), by path. */
   zip: () => Promise<ZipFiles | null>
+  /** The pages of a PDF, as runs of text where they stand. */
+  pdf: () => Promise<PdfPage[] | null>
 }
 
 export type ZipFiles = Map<string, Uint8Array>

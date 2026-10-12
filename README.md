@@ -90,6 +90,7 @@ any two-column file looks like, is read only when an app asks for it.
 | XML | Moodle XML | Moodle | `.xml` |
 | Package | Blackboard pool or test export | Blackboard | `.zip` |
 | Package | QTI package (Canvas, Brightspace, Blackboard and others) | IMS QTI | `.zip` `.imscc` |
+| PDF | Google Forms printout | Google Forms | `.pdf` |
 
 <!-- /formats -->
 

@@ -9,7 +9,7 @@ import type { Shape } from '../src/reader'
 export const FORMATS_START = '<!-- formats: written by `bun run docs` from src/catalog.ts -->'
 export const FORMATS_END = '<!-- /formats -->'
 
-const SHAPES: [Shape, string][] = [['table', 'Table'], ['text', 'Text'], ['xml', 'XML'], ['package', 'Package']]
+const SHAPES: [Shape, string][] = [['table', 'Table'], ['text', 'Text'], ['xml', 'XML'], ['package', 'Package'], ['pdf', 'PDF']]
 
 export function formatsTable(): string {
   const rows = SHAPES.flatMap(([shape, name]) =>

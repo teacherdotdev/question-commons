@@ -25,6 +25,7 @@ export type FormatInfo = {
 export const FORMATS: readonly FormatInfo[] = [
   { id: 'bb-package', label: 'Blackboard pool or test export', originator: 'Blackboard', shape: 'package', fileTypes: ['.zip'] },
   { id: 'qti-package', label: 'QTI package (Canvas, Brightspace, Blackboard and others)', originator: 'IMS QTI', shape: 'package', fileTypes: ['.zip', '.imscc'] },
+  { id: 'google-forms-print', label: 'Google Forms printout', originator: 'Google Forms', shape: 'pdf', fileTypes: ['.pdf'] },
   { id: 'bb-xml', label: 'Blackboard pool file', originator: 'Blackboard', shape: 'xml', fileTypes: ['.dat', '.xml'] },
   { id: 'qti-xml', label: 'QTI XML (Canvas, Brightspace, Blackboard and others)', originator: 'IMS QTI', shape: 'xml', fileTypes: ['.xml', '.qti'] },
   { id: 'moodle-xml', label: 'Moodle XML', originator: 'Moodle', shape: 'xml', fileTypes: ['.xml'] },
