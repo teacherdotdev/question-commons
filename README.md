@@ -14,7 +14,7 @@
 npm install @teacherdotdev/question-commons
 ```
 
-> v0.1, in development: not yet published to npm.
+> v0.1, in development: the spec and API may still change before 1.0.
 
 <table>
 <tr>
