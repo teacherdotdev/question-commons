@@ -8,6 +8,7 @@ import { flashcards } from './flashcards'
 import { gift } from './gift'
 import { kahoot } from './kahoot'
 import { moodleXml } from './moodle-xml'
+import { qti } from './qti'
 import { respondus } from './respondus'
 import { respondusCsv } from './respondus-csv'
 import { spreadsheet } from './spreadsheet'
@@ -18,6 +19,7 @@ import { text2qti } from './text2qti'
  * before plain text, a specific Format before a general one (ADR-0004).
  */
 export const FORMATS: readonly FormatSpec[] = [
+  qti,
   moodleXml,
   bbTsv,
   d2lCsv,

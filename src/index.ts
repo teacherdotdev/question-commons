@@ -65,7 +65,16 @@ async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput> {
 
 const MIN_CONFIDENCE = 0.5
 
-type Trial = { format: FormatSpec; banks: QuestionBank[]; issues: ImportIssue[]; pictures: Record<string, Picture>; confidence: number }
+type Trial = {
+  format: FormatSpec
+  banks: QuestionBank[]
+  issues: ImportIssue[]
+  pictures: Record<string, Picture>
+  /** How many questions the file held in this Format, including those left out. */
+  found: number
+  score: number
+  confidence: number
+}
 
 async function tryFormat(format: FormatSpec, input: FormatInput, score: number, readAt: string): Promise<Trial | null> {
   try {
@@ -74,7 +83,7 @@ async function tryFormat(format: FormatSpec, input: FormatInput, score: number, 
     const imported = banks.reduce((sum, bank) => sum + bank.questions.length, 0)
     const found = Math.max(result.found, imported)
     const share = found ? imported / found : 0
-    return { format, banks, issues, pictures, confidence: imported ? 0.5 * score + 0.5 * share : 0 }
+    return { format, banks, issues, pictures, found, score, confidence: imported ? 0.5 * score + 0.5 * share : 0 }
   } catch {
     return null
   }
@@ -110,7 +119,7 @@ export async function readQuestionFile(
     if (!format) throw new QuestionFileError('That format is not one this package reads.', 'not-recognized')
     const score = candidates.find((candidate) => candidate.format === format.id)?.score ?? 0
     best = await tryFormat(format, input, Math.max(score, 0.5), readAt)
-    if (!best || !best.confidence) {
+    if (!best || !best.found) {
       const first = best?.issues[0]
       throw new QuestionFileError(
         `No questions could be read from this file as ${FORMAT_LABELS[format.id]}.` +
@@ -128,7 +137,12 @@ export async function readQuestionFile(
     for (const trial of trials) {
       if (trial && (!best || trial.confidence > best.confidence + 1e-9)) best = trial
     }
+    // A file plainly in a Format whose every question was left out is still
+    // that Format's Reading: its Import Issues say why nothing came in.
     if (!best || best.confidence < MIN_CONFIDENCE) {
+      best = trials.find((trial) => trial && trial.found > 0 && trial.score >= MIN_CONFIDENCE) ?? best
+    }
+    if (!best || (best.confidence < MIN_CONFIDENCE && !(best.found > 0 && best.score >= MIN_CONFIDENCE))) {
       throw new QuestionFileError(
         `No questions written in a format this package knows were found in “${file.name}”.`,
         'not-recognized',
