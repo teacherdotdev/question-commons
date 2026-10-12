@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A hand-written Blackboard 5 pool, as the Blackboard Test Generator downloads one. -->
+<POOL>
+  <TITLE value="Number facts" />
+  <DESCRIPTION><TEXT>Small number questions.</TEXT></DESCRIPTION>
+  <QUESTIONLIST>
+    <QUESTION id="q1" class="QUESTION_MULTIPLEANSWER" />
+    <QUESTION id="q2" class="QUESTION_MULTIPLECHOICE" />
+    <QUESTION id="q3" class="QUESTION_TRUEFALSE" />
+    <QUESTION id="q4" class="QUESTION_ESSAY" />
+    <QUESTION id="q5" class="QUESTION_FILLINBLANK" />
+    <QUESTION id="q6" class="QUESTION_MATCH" />
+    <QUESTION id="q7" class="QUESTION_ORDER" />
+    <QUESTION id="q8" class="QUESTION_HOTSPOT" />
+  </QUESTIONLIST>
+  <QUESTION_MULTIPLEANSWER id="q1">
+    <BODY><TEXT>Which of these are even?</TEXT></BODY>
+    <ANSWER id="q1_a1" position="1"><TEXT>2</TEXT></ANSWER>
+    <ANSWER id="q1_a2" position="2"><TEXT>3</TEXT></ANSWER>
+    <ANSWER id="q1_a3" position="3"><TEXT>4</TEXT></ANSWER>
+    <GRADABLE><CORRECTANSWER answer_id="q1_a1" /><CORRECTANSWER answer_id="q1_a3" /></GRADABLE>
+  </QUESTION_MULTIPLEANSWER>
+  <QUESTION_MULTIPLECHOICE id="q2">
+    <BODY><TEXT>What is 2 + 3?</TEXT></BODY>
+    <ANSWER id="q2_a1" position="1"><TEXT>4</TEXT></ANSWER>
+    <ANSWER id="q2_a2" position="2"><TEXT>5</TEXT></ANSWER>
+    <ANSWER id="q2_a3" position="3"><TEXT>6</TEXT></ANSWER>
+    <GRADABLE><CORRECTANSWER answer_id="q2_a2" /></GRADABLE>
+  </QUESTION_MULTIPLECHOICE>
+  <QUESTION_TRUEFALSE id="q3">
+    <BODY><TEXT>7 is a prime number.</TEXT></BODY>
+    <ANSWER id="q3_a1" position="1"><TEXT>True</TEXT></ANSWER>
+    <ANSWER id="q3_a2" position="2"><TEXT>False</TEXT></ANSWER>
+    <GRADABLE><CORRECTANSWER answer_id="q3_a1" /></GRADABLE>
+  </QUESTION_TRUEFALSE>
+  <QUESTION_ESSAY id="q4">
+    <BODY><TEXT>Explain what makes a number prime.</TEXT></BODY>
+    <ANSWER id="q4_a1"><TEXT>It has exactly two factors.</TEXT></ANSWER>
+  </QUESTION_ESSAY>
+  <QUESTION_FILLINBLANK id="q5">
+    <BODY><TEXT>Two plus two equals ____.</TEXT></BODY>
+    <ANSWER id="q5_a1" position="1"><TEXT>four</TEXT></ANSWER>
+    <ANSWER id="q5_a2" position="2"><TEXT>4</TEXT></ANSWER>
+  </QUESTION_FILLINBLANK>
+  <QUESTION_MATCH id="q6">
+    <BODY><TEXT>Match each number to its word.</TEXT></BODY>
+    <ANSWER id="q6_a1" position="1"><TEXT>1</TEXT></ANSWER>
+    <ANSWER id="q6_a2" position="2"><TEXT>3</TEXT></ANSWER>
+    <CHOICE id="q6_c1"><TEXT>three</TEXT></CHOICE>
+    <CHOICE id="q6_c2"><TEXT>one</TEXT></CHOICE>
+    <CHOICE id="q6_c3"><TEXT>seven</TEXT></CHOICE>
+    <GRADABLE>
+      <CORRECTANSWER answer_id="q6_a1" choice_id="q6_c2" />
+      <CORRECTANSWER answer_id="q6_a2" choice_id="q6_c1" />
+    </GRADABLE>
+  </QUESTION_MATCH>
+  <QUESTION_ORDER id="q7">
+    <BODY><TEXT>Put these in order, smallest first.</TEXT></BODY>
+    <ANSWER id="q7_a1" position="1"><TEXT>10</TEXT></ANSWER>
+    <ANSWER id="q7_a2" position="2"><TEXT>1</TEXT></ANSWER>
+    <ANSWER id="q7_a3" position="3"><TEXT>5</TEXT></ANSWER>
+    <GRADABLE><CORRECTANSWER answer_id="q7_a2" /><CORRECTANSWER answer_id="q7_a3" /><CORRECTANSWER answer_id="q7_a1" /></GRADABLE>
+  </QUESTION_ORDER>
+  <QUESTION_HOTSPOT id="q8">
+    <BODY><TEXT>Click the largest number.</TEXT></BODY>
+  </QUESTION_HOTSPOT>
+</POOL>

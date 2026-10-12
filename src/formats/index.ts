@@ -1,6 +1,7 @@
 import type { FormatSpec } from '../reader'
 import { aiken } from './aiken'
 import { bbGenerator } from './bb-generator'
+import { bbPackage } from './bb-package'
 import { bbTsv } from './bb-tsv'
 import { blooket } from './blooket'
 import { d2lCsv } from './d2l-csv'
@@ -19,6 +20,7 @@ import { text2qti } from './text2qti'
  * before plain text, a specific Format before a general one (ADR-0004).
  */
 export const FORMATS: readonly FormatSpec[] = [
+  bbPackage,
   qti,
   moodleXml,
   bbTsv,
