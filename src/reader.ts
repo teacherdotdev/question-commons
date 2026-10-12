@@ -89,6 +89,11 @@ export type ReaderBlank = { name: string; accepted: string[]; dropdown?: boolean
  */
 export const BLANK_MARK = '\uFDD0'
 
+/** Where a Word picture or equation stood, which text cannot hold: a question
+ *  with either is left out (ADR-0003). Noncharacters, like `BLANK_MARK`. */
+export const PICTURE_MARK = '\uFDD1'
+export const MATH_MARK = '\uFDD2'
+
 export type IssueSeverity = 'error' | 'warning' | 'info'
 
 /**

@@ -4,7 +4,8 @@ import type { Picture, QuestionBank } from './question-bank'
 import type { FormatId, FormatInput, FormatSpec, ZipFiles } from './reader'
 import { decodeText } from './text'
 import { unify, type ImportIssue } from './unify'
-import { readZip, ZipLimitError } from './zip'
+import { wordText } from './formats/docx'
+import { readZip, zipFile, ZipLimitError } from './zip'
 
 export * from './question-bank'
 export type { FormatId } from './reader'
@@ -51,7 +52,7 @@ export class QuestionFileError extends Error {
   }
 }
 
-async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput> {
+async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput & { word: boolean }> {
   let zip: ZipFiles | null
   try {
     zip = await readZip(bytes)
@@ -59,8 +60,10 @@ async function inputOf(name: string, bytes: Uint8Array): Promise<FormatInput> {
     if (reason instanceof ZipLimitError) throw new QuestionFileError(reason.message, 'unsafe-archive')
     zip = null
   }
-  const text = zip ? '' : decodeText(bytes).text
-  return { name, bytes, text: () => text, zip: async () => zip }
+  // A Word document is read as its text, as if typed into a text file.
+  const word = Boolean(zip && zipFile(zip, 'word/document.xml'))
+  const text = zip ? (word ? await wordText(zip) : '') : decodeText(bytes).text
+  return { name, bytes, word, text: () => text, zip: async () => zip }
 }
 
 const MIN_CONFIDENCE = 0.5
@@ -144,7 +147,9 @@ export async function readQuestionFile(
     }
     if (!best || (best.confidence < MIN_CONFIDENCE && !(best.found > 0 && best.score >= MIN_CONFIDENCE))) {
       throw new QuestionFileError(
-        `No questions written in a format this package knows were found in “${file.name}”.`,
+        input.word
+          ? 'No questions written in a format this package knows were found in this Word document.'
+          : `No questions written in a format this package knows were found in “${file.name}”.`,
         'not-recognized',
       )
     }

@@ -9,7 +9,7 @@ import {
   type RichText,
   type RichTextNode,
 } from './question-bank'
-import { BLANK_MARK, type FormatId, type ImportIssue as ReaderIssue, type ParseResult, type ReaderQuestion } from './reader'
+import { BLANK_MARK, MATH_MARK, PICTURE_MARK, type FormatId, type ImportIssue as ReaderIssue, type ParseResult, type ReaderQuestion } from './reader'
 import { blocksText, isBlank } from './rich-text'
 import { excerpt } from './text'
 
@@ -134,6 +134,9 @@ function markUnderscores(blocks: RichText, blanks: number): RichText {
 }
 
 function unifyQuestion(question: ReaderQuestion, number: number): UnifiedQuestion {
+  const json = JSON.stringify(question)
+  if (json.includes(PICTURE_MARK)) return leaveOut('picture-missing', 'a picture in it is not text, so it was left out.')
+  if (json.includes(MATH_MARK)) return leaveOut('math-not-read', 'an equation in it can’t be read as text, so it was left out.')
   const fillIn = question.kind === 'fill-in-blank' || question.kind === 'fill-in-blanks'
   if (question.kind === 'fill-in-blank') question = { ...question, stem: markUnderscores(question.stem, 1) }
   else if (question.kind === 'fill-in-blanks') question = { ...question, stem: markUnderscores(question.stem, question.blanks.length) }
