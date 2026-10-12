@@ -36,7 +36,8 @@ export function blocksText(blocks: Blocks): string {
     if (node.type === 'inline-math') return node.source ?? ''
     if (node.type === 'code-block') return node.text ?? ''
     const inner = (node.content ?? []).map(walk).join(node.type === 'table-row' ? ' ' : '')
-    return ['paragraph', 'heading', 'list-item', 'table-row'].includes(node.type) ? `${inner}\n` : inner
+    // A block ends its line, once, however deeply its paragraphs nest.
+    return ['paragraph', 'heading', 'list-item', 'table-row'].includes(node.type) && !inner.endsWith('\n') ? `${inner}\n` : inner
   }
   return blocks.map(walk).join('').trim()
 }
