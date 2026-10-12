@@ -5,8 +5,13 @@
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": []
+    "types": [],
+    "emitDeclarationOnly": true
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
 }

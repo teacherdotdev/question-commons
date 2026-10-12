@@ -14,11 +14,14 @@
     },
     "./schema.json": "./schema/question-bank-1.0.0.schema.json"
   },
-  "files": ["dist", "schema"],
+  "files": [
+    "dist",
+    "schema"
+  ],
   "scripts": {
     "test": "bun test",
     "check": "tsc --noEmit",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json"
+    "build": "rm -rf dist && bun build src/index.ts --outdir dist --target browser --format esm --external jszip && tsc -p tsconfig.build.json"
   },
   "dependencies": {
     "jszip": "^3.10.1"
