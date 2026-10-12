@@ -1,0 +1,47 @@
+Title: Light
+Points: 2
+1) Which colour of light bends the most in a prism?
+a. Red
+*b. Violet
+c. Green
+
+2) Sound travels faster in water than in air.
+*a. True
+b. False
+
+Type: E
+3) Explain why the sky looks blue.
+a. Shorter wavelengths of sunlight scatter more in the air.
+
+Type: F
+4) The study of light is called what?
+a. optics
+b. Optics
+
+Type: MT
+5) Match each scientist to their discovery.
+a. Newton = gravity
+b. Curie = radioactivity
+
+Type: ORD
+6) Put these colours in rainbow order.
+a. Red
+b. Orange
+c. Yellow
+
+Type: MA
+7) Which of these are primary colours of light?
+*a. Red
+b. Yellow
+*c. Blue
+
+Type: FMB
+8) Light is a [electromagnetic] wave and travels at about 300,000 [km, kilometres] per second.
+
+Type: JUM
+9) A jumbled sentence question.
+a. one
+
+10) Which planet is shown? [img:planet.png]
+a. Mars
+*b. Saturn
