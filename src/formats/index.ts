@@ -2,6 +2,7 @@ import type { FormatSpec } from '../reader'
 import { aiken } from './aiken'
 import { bbGenerator } from './bb-generator'
 import { blooket } from './blooket'
+import { d2lCsv } from './d2l-csv'
 import { flashcards } from './flashcards'
 import { gift } from './gift'
 import { kahoot } from './kahoot'
@@ -14,6 +15,7 @@ import { text2qti } from './text2qti'
  * before plain text, a specific Format before a general one (ADR-0004).
  */
 export const FORMATS: readonly FormatSpec[] = [
+  d2lCsv,
   blooket,
   kahoot,
   bbGenerator,
