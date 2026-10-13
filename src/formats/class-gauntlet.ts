@@ -5,18 +5,19 @@ import type { FormatInput, FormatSpec, ImportIssue, ParseResult, ReaderQuestion 
 import { isBlankRow, readSheet, type SheetRow } from './sheet'
 
 /**
- * Class Gauntlet's question sets, as it exports them, as its template lays
+ * Class Gauntlet's question banks, as it exports them, as its template lays
  * them out, or as the open-source project it grew from wrote them.
  *
- * Its template: `question, A, B, C, D, answer, explanation`, D and the
- * explanation optional, the answer a letter or the right choice's own text.
- * Teachers paste it from a spreadsheet as tab-separated cells, too. Its
- * export adds `set title, subject, grade` to every row, so a file holds
- * several sets; each becomes a Question Bank with its subject and grade as
- * Extras (ADR-0005). Without a set title, the file is one bank named after
- * it.
+ * Its template: `question, A, B, C, D, answer, explanation, topics`, D, the
+ * explanation and the topics optional, the answer a letter or the right
+ * choice's own text, the topics split on commas. Teachers paste it from a
+ * spreadsheet as tab-separated cells, too. Its export adds `bank title,
+ * subject, grade` (`set title` in older exports) to every row, so a file
+ * holds several banks; each becomes a Question Bank with its subject and
+ * grade as Extras (ADR-0005). Without a bank title, the file is one bank
+ * named after it.
  *
- * The original project's: `set title, The original project's: `set title,
+ * The original project's: `set title,
  * subject, grade, question, choices, correct, explanation`, the choices a
  * JSON list and the right one counted from zero. Every question is Multiple
  * Choice with two to four choices.
@@ -31,6 +32,7 @@ type Header = {
   grade: number
   question: number
   explanation: number
+  topics: number
   letters: number[]
   answer: number
   choices: number
@@ -46,11 +48,12 @@ export function gauntletHeader(rows: SheetRow[]): Header | null {
     const at = (name: string) => labels.indexOf(name)
     const header = {
       line: row.line,
-      title: at('set title'),
+      title: at('bank title') >= 0 ? at('bank title') : at('set title'),
       subject: at('subject'),
       grade: at('grade'),
       question: at('question'),
       explanation: at('explanation'),
+      topics: at('topics'),
       letters: ['a', 'b', 'c', 'd'].map(at),
       answer: at('answer'),
       choices: at('choices'),
@@ -90,6 +93,7 @@ function parseRow(row: SheetRow, header: Header): { question: ReaderQuestion } |
   }
   if (choices.length < 2 || choices.some((choice) => !choice)) return { error: 'it needs two to four choices, with none empty.' }
   const explanation = cell(header.explanation)
+  const topics = cell(header.topics).split(',').map((tag) => tag.trim()).filter(Boolean)
   return {
     question: {
       kind: 'multiple-choice',
@@ -97,6 +101,7 @@ function parseRow(row: SheetRow, header: Header): { question: ReaderQuestion } |
       stem: plainBlocks(cell(header.question)),
       choices: choices.map((choice, index) => ({ content: plainBlocks(choice), correct: index === correct })),
       ...(explanation ? { explanation: plainBlocks(explanation) } : {}),
+      ...(topics.length ? { topics } : {}),
     },
   }
 }

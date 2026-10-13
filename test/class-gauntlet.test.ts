@@ -33,6 +33,16 @@ describe('Class Gauntlet spreadsheet', () => {
     ])
   })
 
+  test('reads a topics column, split on commas, and names banks by bank title', async () => {
+    const reading = await read('banks.csv', [
+      'bank title,subject,grade,question,A,B,C,D,answer,explanation,topics',
+      'History,,,When did World War II end?,1945,1918,,,A,,"World War II, dates"',
+      'History,,,Who was the first U.S. president?,Washington,Lincoln,,,A,,',
+    ].join('\n'))
+    expect(reading.banks.map((bank) => bank.name)).toEqual(['History'])
+    expect(reading.banks[0]!.questions.map((question) => question.topics)).toEqual([['World War II', 'dates'], undefined])
+  })
+
   test('reads the original project’s layout: choices as a list and a right answer counted from zero', async () => {
     const reading = await read('sets.csv', [
       'set title,subject,grade,question,choices,correct,explanation',
